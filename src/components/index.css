@@ -1,5 +1,5 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -14,6 +14,7 @@
   -webkit-text-size-adjust: 100%;
 }
 
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -25,17 +26,26 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  width: 100;
+  height: 100;
 }
 
 h1 {
   font-size: 3.2em;
-  line-height: 1.1;
+  line-height: 1.2;
 }
-
+body{
+  background:linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)
+  ), url("https://expertphotography.b-cdn.net/wp-content/uploads/2022/03/Background-Changer-App-Editing.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  color:white;
+}
+table{
+  z-index: 1;
+  position: relative;
+}
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -59,9 +69,6 @@ button:focus-visible {
   :root {
     color: #213547;
     background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
   }
   button {
     background-color: #f9f9f9;
