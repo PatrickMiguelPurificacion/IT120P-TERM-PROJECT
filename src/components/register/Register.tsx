@@ -18,7 +18,7 @@ function Register(){
                     {showSuccess && <div className="alert alert-success alerts text-center" role="alert">{successMessage}</div>}
                     <div className="row">
                         <div className="col-md-6 text-center main-register-1">
-                            <img src="../src/assets/login/main-section-login.webp" />
+                            <img src="../src/assets/register/main-section-register.jpg" />
                         </div>
                         <div className="col-md-6 main-register-2">
                             <div className="card shadow-2-strong card-register" style={{borderRadius: "15px"}}>

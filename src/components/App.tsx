@@ -5,6 +5,7 @@ import Home from './home/Home'
 import About from './about/About'
 import Login from './login/Login'
 import Register from './register/Register'
+import Services from './services/Services'
 import Error from './error/Error'
 
 function App() {
@@ -86,7 +87,7 @@ function App() {
                 <Route path="/home" element={<Home />}/>
                 <Route path="/about" element={<About />} />
                 <Route path="/faq" element={<Home />} />
-                {/*<Route path="/services" element={} />*/}
+                <Route path="/services" element={<Services />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 {/*<Route path="/profile" element={} />*/}
