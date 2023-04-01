@@ -11,6 +11,8 @@ import OrderDisplay from './OrderDisplay/OrderDisplay'
 import OrderPage from './OrderPage/OrderPage'
 import Empview from "./contact-directory/Empview";
 import Empdisplay from "./Empdisplay/Empdisplay";
+import StockDisplay from "./ItemStockDisplay/StockDisplay"
+import StockPage from "./ItemStockPage/StockPage"
 
 function App() {
 

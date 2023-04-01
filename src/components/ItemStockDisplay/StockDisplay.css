@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Holtwood+One+SC&display=swap');
+
+.StockDisplay{
+    background:linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)
+    ), url("https://cloudfront-us-east-1.images.arcpublishing.com/tgam/WN7P7JBQRNBFVLXWIYE5CUXNEY.JPG");
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: relative;
+    justify-content: center;
+}
+
+h1.a{
+    font-size: 30px;
+    padding: 20px;
+    font-family: 'Holtwood One SC', serif;
+    text-align: left;
+    color: black;
+    background-color: blue;
+    inline-size: 100%;
+    top: 0;
+    position: fixed;
+}
+
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 40%;
+  }
+
+table.displayTable{
+    margin-left: auto;
+    margin-right: auto;
+    font-family: 'Holtwood One SC', serif;
+    border-collapse: collapse;
+    width: 70%;
+    text-align: center;
+    top: 20%;
+  }
+
+table.displayTable td, table.displayTable th{
+    border: 1px solid #ddd;
+    padding-left: 150px;
+    padding-right: 150px;
+    border-collapse: collapse;
+}
+
+.emptyRow{
+    padding-top: 2%;
+}
+
+.full{
+    background-color: green;
+    inline-size: 150%;
+}
+
+.empty{
+    background-color: red;
+    inline-size: 150%;
+}
+
+table.displayTable tr:nth-child(even){
+    background-color: lightgray;
+    padding-left: 125px;
+    padding-right: 125px;
+    text-align: center;
+}
+
+table.displayTable tr:nth-child(odd){
+    background-color: white;
+    padding-left: 125px;
+    padding-right: 125px;
+    text-align: center;
+}
+
+table.displayTable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: center;
+    background-color: lightgray;
+    color: #aa0404;
+  }
+
+  
