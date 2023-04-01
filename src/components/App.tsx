@@ -9,6 +9,8 @@ import Services from './services/Services'
 import Error from './error/Error'
 import OrderDisplay from './OrderDisplay/OrderDisplay'
 import OrderPage from './OrderPage/OrderPage'
+import Empview from "./contact-directory/Empview";
+import Empdisplay from "./Empdisplay/Empdisplay";
 
 function App() {
 
