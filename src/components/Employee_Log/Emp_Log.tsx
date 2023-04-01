@@ -1,8 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-
 import * as FaIcons from 'react-icons/fa' 
-
 import { SidebarData } from './SidebarData'
 
 const Sidebar: React.FunctionComponent = () => {
