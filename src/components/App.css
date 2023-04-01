@@ -1,12 +1,36 @@
-body{
-  background:linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)
-  ), url("https://expertphotography.b-cdn.net/wp-content/uploads/2022/03/Background-Changer-App-Editing.jpg");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-  color:white;
+.navigation{
+  background-color: #005bdf;
 }
-table{
-  z-index: 1;
-  position: relative;
+
+.navigation img{
+  width: 200px;
+}
+
+.navigation-items{
+  font-size: 1.25rem;
+}
+
+.sticky{
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+@media (max-width: 1200px) {
+
+}
+
+@media (max-width: 1024px) {
+  .navigation-items{
+      text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+
+}
+
+@media (max-width: 480px) {
+
 }
