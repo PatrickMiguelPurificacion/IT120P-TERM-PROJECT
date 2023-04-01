@@ -7,6 +7,8 @@ import Login from './login/Login'
 import Register from './register/Register'
 import Services from './services/Services'
 import Error from './error/Error'
+import OrderDisplay from './OrderDisplay/OrderDisplay'
+import OrderPage from './OrderPage/OrderPage'
 
 function App() {
 
