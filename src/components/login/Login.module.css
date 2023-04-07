@@ -1,13 +1,13 @@
-.main-login{
+.main_login{
     background-color: #343434;
     height: 110vh;
 }
 
-.main-login-1{
+.main_login_1{
     padding-top: 20vh;
 }
 
-.main-login-2{
+.main_login_2{
     padding-top: 10vh;
 }
 
@@ -16,14 +16,14 @@
     height: auto;
 }
 
-.card-login{
+.card_login{
     border: solid;
     border-color: #E2F4F6;
     border-width: 15px;
     background-color: #F2F9FF;
 }
 
-.card-inner-login{
+.card_inner_login{
     border-radius: 5px;
     border-color: black;
     outline-style: solid;

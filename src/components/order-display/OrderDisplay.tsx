@@ -1,13 +1,19 @@
 import React from 'react'
-import'./OrderDisplay.css'
+import OrderDisplayCSS from './OrderDisplay.module.css'
+import Employee from '../employee/Employee'
+import logo from '../../assets/order-display/FabricFinesse.png'
+
 const OrderDisplay = () => {
   return (
-    <div className='OrderDisplay'>
-      <h1 className='a'>ORDERS DISPLAY PAGE</h1>
+    <div className={OrderDisplayCSS.OrderDisplay}>
+      <Employee/>
+      <h1 className={OrderDisplayCSS.a}>ORDERS DISPLAY PAGE</h1>
       <br></br>
       <br></br>
       <br></br>
-      <h2 className='b'>FABRIC FINESSE</h2>
+      <div className={OrderDisplayCSS.logo}>
+        <img src={logo} />
+      </div>
       <br></br>
       <br></br>
       <br></br>
@@ -26,7 +32,7 @@ const OrderDisplay = () => {
         <tr>
           <td>1</td>
           <td>BRAD</td>
-          <td> <p className='done'>DONE</p></td>
+          <td> <p className={OrderDisplayCSS.done}>DONE</p></td>
         </tr>
         <tr>
           <td></td>
@@ -36,7 +42,7 @@ const OrderDisplay = () => {
         <tr>
           <td>2</td>
           <td>EMILY</td>
-          <td><p className='pending'>PENDING</p></td>
+          <td><p className={OrderDisplayCSS.pending}>PENDING</p></td>
         </tr>
         <tr>
           <td></td>
@@ -46,7 +52,7 @@ const OrderDisplay = () => {
         <tr>
           <td>3</td>
           <td>AARON</td>
-          <td> <p className='done'>DONE</p></td>
+          <td> <p className={OrderDisplayCSS.done}>DONE</p></td>
         </tr>
         <tr>
           <td></td>
@@ -56,7 +62,7 @@ const OrderDisplay = () => {
         <tr>
           <td>4</td>
           <td>JOSH</td>
-          <td><p className='pending'>PENDING</p></td>
+          <td><p className={OrderDisplayCSS.pending}>PENDING</p></td>
         </tr>
         <tr>
           <td></td>
@@ -66,7 +72,7 @@ const OrderDisplay = () => {
         <tr>
           <td>5</td>
           <td>JEREMEY</td>
-          <td> <p className='done'>DONE</p></td>
+          <td> <p className={OrderDisplayCSS.done}>DONE</p></td>
         </tr>
         <tr>
           <td></td>
@@ -76,7 +82,7 @@ const OrderDisplay = () => {
         <tr>
           <td>6</td>
           <td>PAT</td>
-          <td><p className='pending'>PENDING</p></td>
+          <td><p className={OrderDisplayCSS.pending}>PENDING</p></td>
         </tr>
       </table>
       

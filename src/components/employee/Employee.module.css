@@ -1,0 +1,90 @@
+.wrapper {
+    display: flex;
+    flex-direction: row;
+  }
+  .sidebar {
+    display: block;
+    margin: 0;
+    padding: 0;
+    width: 175px;
+    background-color: black;
+    position: fixed;
+    height: 100%;
+    overflow: auto;
+  }
+
+  .brand_name{
+    display: block;
+    color: white;
+    padding: 16px;
+    padding-bottom: 22px;
+    text-align: center;
+  }
+
+  .brand_name b {
+    color: blue;
+  }
+
+  .brand_name b:nth-child(1) {
+    color: red;
+  }
+  
+  .sidebar a {
+    display: block;
+    color: white;
+    padding: 16px;
+    text-decoration: none;
+  }
+   
+  .sidebar a:active {
+    background-color: #555;
+    color: white;
+  }
+  
+  .sidebar a:hover:not(a:active) {
+    background-color: #555;
+    color: white;
+  }
+
+  .is-sticky {
+    position: fixed;
+    top: 10px;
+    z-index: 999;
+    animation: 500ms ease-in-out 0s normal none 1 running fadeInDown;
+  }
+
+@media (max-width: 1200px) {
+
+}
+
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+      .sidebar a {float: left;}
+      .content div {margin-left: 0;}
+  
+      .wrapper {
+        display: flex;
+        flex-direction: column;
+      }
+  
+      .navbar h1 {
+        display: flex;
+        font-size: 18px;
+        padding: 0;
+      }
+}
+
+@media (max-width: 768px) {
+
+}
+
+@media (max-width: 480px) {
+    .sidebar a {
+        text-align: center;
+        float: none;
+      }
+}

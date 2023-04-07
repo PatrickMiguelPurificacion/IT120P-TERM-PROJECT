@@ -1,15 +1,15 @@
 .OrderPage{
   background:linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)
-  ), url("https://cloudfront-us-east-1.images.arcpublishing.com/tgam/WN7P7JBQRNBFVLXWIYE5CUXNEY.JPG");
+  ), url('../../assets/order-page/background.png');
   background-position: center;
   background-size: 100% 100%;
   background-repeat: no-repeat;
   position: relative;
   justify-content: center;
-  
+  height: 100vh;
 }
 
-h1.a{
+.a{
   text-align: left;
   color:black;
   background-color:#1A50DD;
@@ -17,77 +17,76 @@ h1.a{
   font-weight: bolder;
   font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 20px;
+  padding-left: 200px;
 }
 
-h2.b{
-  margin:  auto;
-  font-style: bold;
-  height: 100%;
-  inline-size: 20%;
-  color:white;
-  text-align: center;
-  font-weight: bolder;
-   
+.logo {
+  display: flex;
+  justify-content: center;
+  width: 50%;
+  height: auto;
+  margin: auto;
 }
-div.dd{
+
+.dd div{
 
 
 align-items: center;
 height: 10%;
 color:white;
 }
-div.ee{
+.ee div{
 
 
 align-items: center;
 height: 10%;
 color:white;
 }
-form.d{
+.d form{
   align-content: center;
   font-size: 30px;
   width: 10%;
   font-weight: bold;
   
 }
-form.g{
+.g form{
   align-content: center;
   font-size: 30px;
   width: 10%;
   font-weight: bold;
 }
-img {
+.OrderPage img {
   display: block;
   margin-left: auto;
   margin-right: auto;
 }
 
 
-.form-container {
+.form_container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 60vh;
+  height: 50vh;
 
 }
 
-.form-wrapper {
+.form_wrapper {
   margin: 0 20px;
 }
 
-form.d, form.g {
+.d form, .g form{
   align-content: center;
   font-size: 30px;
   width: 400px;
 }
-div.form-container {
+.form_container div{
   display: flex;
   justify-content: center;
   gap: 20rem;
   color: white;
   margin-top: 20px;
 }
-input[type="submit"] {
+.form_container input[type="submit"] {
   background-color:#1A50DD;
   color: white;
   display: block;
@@ -97,9 +96,9 @@ width: 250px;
 font-weight: bolder;
 }
 
-input.c{
+.c input{
   background-color:#D9D9D9;
 }
-input.f{
+.f input{
   background-color:#D9D9D9;
 }
