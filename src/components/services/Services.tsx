@@ -1,4 +1,4 @@
-import './Services.css'
+import ServicesCSS from './Services.module.css'
 
 function Services(){
 
@@ -31,12 +31,12 @@ function Services(){
 
     return(
         <>
-            <div className="main-services">
+            <div className={ServicesCSS.main_services}>
                 <div className="container">
-                    <div className="row text-center main-services-1">
+                    <div className={"row text-center " + ServicesCSS.main_services_1}>
                         <p className="display-1 mt-5">LAUNDRY SERVICES</p>
                     </div>
-                    <div className="row main-services-2">
+                    <div className={"row " + ServicesCSS.main_services_2}>
                         <div className="col-md-6">
                             <h1 className="text-center">Types of Services</h1>
                             <ul className="ms-5 lead mt-5">
@@ -57,38 +57,75 @@ function Services(){
                     </div>
                 </div>
             </div>
-            {services.map((item, index) => (
-            <div className="services" key={index}>
-                <div className="services-header">
-                    <h1 className="display-3">{item.Name}</h1>
-                </div>
-                <div className="container">
-                    <div className="row text-light">
-                        <div className="col-md-4 text-center">
-                            <p className="display-5 mt-5">PHP{item.Price}</p>
-                            <img src="../src/assets/temp-image.jpg" width="80%" />
-                            <button className="btn btn-primary mt-5 p-3">Create Order</button>
-                        </div>
-                        <div className="col-md-8">
-                            <div className="row mt-5 p-5">
-                                <div className="col-md-6">
-                                    <h2 className="text-center">Service Description</h2>
-                                    <p className="mt-4 p-3">{item.Description}</p>
-                                </div>
-                                <div className="col-md-6">
-                                    <h2 className="text-center">Procedure</h2>
-                                    <p className="mt-4 p-3 ps-5">{item.Procedure}</p>
+            {services.map((item, index) => {
+                if(index % 2 == 0){
+                    return(
+                        <div className={ServicesCSS.services} key={index}>
+                            <div className={ServicesCSS.services_header}>
+                                <h1 className="display-3">{item.Name}</h1>
+                            </div>
+                            <div className="container">
+                                <div className="row text-light">
+                                    <div className="col-md-4 text-center">
+                                        <p className="display-5 mt-5">PHP{item.Price}</p>
+                                        <img src="../src/assets/temp-image.jpg" width="80%" />
+                                        <button className="btn btn-primary mt-5 p-3">Create Order</button>
+                                    </div>
+                                    <div className="col-md-8">
+                                        <div className="row mt-5 p-5">
+                                            <div className="col-md-6">
+                                                <h2 className="text-center">Service Description</h2>
+                                                <p className="mt-4 p-3">{item.Description}</p>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <h2 className="text-center">Procedure</h2>
+                                                <p className="mt-4 p-3 ps-5">{item.Procedure}</p>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-5 p-5 text-center">
+                                            <h2>Type of Delivery</h2>
+                                            <p className="mt-4 p-3">{item.Delivery}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="row mt-5 p-5 text-center">
-                                <h2>Type of Delivery</h2>
-                                <p className="mt-4 p-3">{item.Delivery}</p>
+                        </div>
+                    )
+                }else{
+                    return (
+                        <div className={ServicesCSS.services} key={index}>
+                            <div className={ServicesCSS.services_header}>
+                                <h1 className="display-3">{item.Name}</h1>
+                            </div>
+                            <div className="container">
+                                <div className="row text-light">
+                                    <div className="col-md-8">
+                                        <div className="row mt-5 p-5">
+                                            <div className="col-md-6">
+                                                <h2 className="text-center">Service Description</h2>
+                                                <p className="mt-4 p-3">{item.Description}</p>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <h2 className="text-center">Procedure</h2>
+                                                <p className="mt-4 p-3 ps-5">{item.Procedure}</p>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-5 p-5 text-center">
+                                            <h2>Type of Delivery</h2>
+                                            <p className="mt-4 p-3">{item.Delivery}</p>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4 text-center">
+                                        <p className="display-5 mt-5">PHP{item.Price}</p>
+                                        <img src="../src/assets/temp-image.jpg" width="80%" />
+                                        <button className="btn btn-primary mt-5 p-3">Create Order</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            ))}
+                    )
+                }
+            })}
         </>
     )
 }

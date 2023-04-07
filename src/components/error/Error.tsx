@@ -1,10 +1,10 @@
-import './Error.css'
+import ErrorCSS from './Error.module.css'
 
 function Error(){
     
     return(
-        <div className="error">
-        <div className="page-wrap d-flex flex-row align-items-center">
+        <div className={ErrorCSS.error}>
+        <div className={"d-flex flex-row align-items-center " + ErrorCSS.page_wrap}>
             <div className="container">
                 <div className="row justify-content-center">
                     <div className="col-md-12 text-center text-light">
