@@ -1,0 +1,50 @@
+.main_register{
+    background-color: #343434;
+    height: 110vh;
+}
+
+.main_register_1{
+    padding-top: 20vh;
+}
+
+.main_register_1 img{
+    width: 70%;
+}
+
+.main_register_2{
+    padding-top: 10vh;
+}
+
+.logo{
+    width: 50%;
+    height: auto;
+}
+
+.card_register{
+    border: solid;
+    border-color: #E2F4F6;
+    border-width: 15px;
+    background-color: #F2F9FF;
+}
+
+.card_inner_register{
+    border-radius: 5px;
+    border-color: black;
+    outline-style: solid;
+}
+
+@media (max-width: 1200px) {
+
+}
+
+@media (max-width: 1024px) {
+
+}
+
+@media (max-width: 768px) {
+
+}
+
+@media (max-width: 480px) {
+
+}

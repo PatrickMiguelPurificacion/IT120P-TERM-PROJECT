@@ -1,0 +1,103 @@
+.main_home{
+    background:
+    linear-gradient(
+      rgba(0, 0, 0, 0.5),
+      rgba(0, 0, 0, 0.5)
+    ), url("../src/assets/home/background.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    color: white;
+    height: 100vh;
+  }
+  
+  .main_home_1{
+    padding-top: 16vh;
+    font-size: 2.25rem;
+  }
+  
+  .main_home_1 img{
+    height: 15%;
+    max-width: 100%;
+  }
+  
+  .main_home_1 button{
+    font-size: 1.5rem;
+    margin-left: 2.25vh;
+    margin-right: 2.25vh;
+    width: 40%;
+  }
+  
+  .main_home_2{
+    padding-top: 20vh;
+  }
+  
+  .main_home_2 img{
+    height: 90%;
+    max-width: 100%;
+  }
+  
+  .FAQ_section{
+    background-color: #1373FF;
+    height: 105vh;
+    padding-top: 10vh;
+    color: white;
+  }
+  
+  .contact_admin_section{
+    background-color: #343434;
+    height: 100vh;
+    padding-top: 10vh;
+    color: white;
+  }
+  
+  .contact_admin_section button{
+    font-size: 1.5rem;
+    width: 50%;
+  }
+  
+  @media (max-width: 1200px) {
+    .main_home_1{
+      font-size: 1.5rem;
+    }
+    .main_home_1 button{
+      margin-left: 1vh;
+      margin-right: 1vh;
+    }
+  }
+  
+  @media (max-width: 1024px) {
+    .main_home_1{
+      font-size: 1.25rem;
+    }
+    .main_home_1 button{
+      font-size: 1.25rem;
+      margin-left: 1vh;
+      margin-right: 1vh;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .main_home_1{
+      font-size: 1.25rem;
+    }
+    .main_home_1 button{
+      font-size: 1.25rem;
+      margin-left: 1.75vh;
+      margin-right: 1.75vh;
+    }
+    .main_home_2{
+      padding-top: 1.5vh;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .main_home_1{
+      font-size: 0.75rem;
+    }
+    .main_home_1 button{
+      font-size: 0.75rem;
+      margin-left: 1vh;
+      margin-right: 1vh;
+    }
+  }

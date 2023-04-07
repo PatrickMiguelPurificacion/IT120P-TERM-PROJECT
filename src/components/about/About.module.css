@@ -1,0 +1,55 @@
+.main_about{
+    background-color: #343434;
+    height: 100vh;
+    color: white;
+}
+
+.main_about_1{
+    padding-top: 20vh;
+}
+
+.main_about_1 img{
+    width: 75%;
+}
+
+
+.main_about_2{
+    padding-top: 5vh;
+    font-size: 1.25rem;
+}
+
+.MV_section{
+    background-color: #1373FF;
+    height: 100vh;
+    padding-top: 10vh;
+}
+
+.card_MV{
+    border: solid;
+    border-color: #E2F4F6;
+    border-width: 15px;
+    background-color: #F2F9FF;
+}
+
+.card_inner_MV{
+    border-radius: 5px;
+    border-color: black;
+    outline-style: solid;
+    color: black;
+}
+
+@media (max-width: 1200px) {
+
+}
+
+@media (max-width: 1024px) {
+
+}
+
+@media (max-width: 768px) {
+
+}
+
+@media (max-width: 480px) {
+
+}

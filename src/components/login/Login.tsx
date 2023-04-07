@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import './Login.css'
+import LoginCSS from './Login.module.css'
 
 function Login(){
 
@@ -13,18 +13,18 @@ function Login(){
     
     return(
         <>
-            <div className="main-login">
+            <div className={LoginCSS.main_login}>
                 <div className="container">
                     {showError && <div className="alert alert-danger alerts text-center" role="alert">{errorMessage}</div>}              
                     {showSuccess && <div className="alert alert-success alerts text-center" role="alert">{successMessage}</div>}
                     <div className="row">
-                        <div className="col-md-6 text-center main-login-1">
+                        <div className={"col-md-6 text-center " + LoginCSS.main_login_1}>
                             <img src="../src/assets/login/main-section-login.webp" />
                         </div>
-                        <div className="col-md-6 main-login-2">
-                            <div className="card shadow-2-strong card-login" style={{borderRadius: "15px"}}>
-                                <div className="card-body p-3 p-md-4 card-inner-login">
-                                    <img src="../src/assets/logo.png" className="logo mx-auto d-block"></img>
+                        <div className={"col-md-6 " + LoginCSS.main_login_2}>
+                            <div className={"card shadow-2-strong " + LoginCSS.card_login} style={{borderRadius: "15px"}}>
+                                <div className={"card-body p-3 p-md-4 " + LoginCSS.card_inner_login}>
+                                    <img src="../src/assets/logo.png" className={"mx-auto d-block " + LoginCSS.logo}></img>
                                     <p className="mb-4 pb-2 pb-md-0 mb-md-5 text-center">Sign in to your account</p>
                                     <form id="login-form" name="login-form" autoComplete="on">
                                         <div className="row">

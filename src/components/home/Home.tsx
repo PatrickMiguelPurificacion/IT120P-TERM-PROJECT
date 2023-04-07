@@ -1,14 +1,14 @@
 import { Link } from 'react-router-dom'
-import './Home.css'
+import HomeCSS from './Home.module.css'
 
 function Home(){
     
     return(
         <>
-            <div className="main-home">
+            <div className={HomeCSS.main_home}>
                 <div className="container">
                     <div className="row">
-                        <div className="col-md-6 text-center main-home-1">
+                        <div className={"col-md-6 text-center " + HomeCSS.main_home_1}>
                             <img src="../src/assets/logo.png"/>
                             <p className="p-5">Welcome to the employee management system of FabricFinesse. Please login to start working!</p>
                             <div className="p-5">
@@ -16,13 +16,13 @@ function Home(){
                                 <Link to="/about"><button type="button" className="btn btn-primary">LEARN MORE</button></Link>
                             </div>
                         </div>
-                        <div className="col-md-6 text-center main-home-2">
+                        <div className={"col-md-6 text-center " + HomeCSS.main_home_2}>
                             <img src="../src/assets/home/main-section-front.jpg"/>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className="FAQ-section" id="F-A-Q">
+            <div className={HomeCSS.FAQ_section} id="F-A-Q">
                 <p className="text-center display-2">FREQUENTLY ASKED QUESTIONS</p>
                 <div className="container">
                     <div className="row">
@@ -69,7 +69,7 @@ function Home(){
                     </div>
                 </div>
             </div>
-                <div className="contact-admin-section">
+                <div className={HomeCSS.contact_admin_section}>
                     <p className="text-center display-2">CONTACT AN ADMIN</p>
                     <div className="container">
                     <div className="row">
