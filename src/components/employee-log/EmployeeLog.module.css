@@ -1,8 +1,9 @@
 .log {
-    margin: 0;
-    font-family: "Lato", sans-serif;
-    background-image: url('https://media.discordapp.net/attachments/847873039369633792/1091661033589985340/image.png?width=909&height=676');
-    background-size: cover;
+    background:linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)
+    ), url('../../assets/employee-log/background.png');
+    background-position: center;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
     color: white;
   }
   

@@ -1,6 +1,6 @@
 .Empdisplay{
     background:linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)
-    ), url("https://cloudfront-us-east-1.images.arcpublishing.com/tgam/WN7P7JBQRNBFVLXWIYE5CUXNEY.JPG");
+    ), url('../../assets/employee-display/background.png');
     background-position: center;
     background-size: 100% 100%;
     background-repeat: no-repeat;
