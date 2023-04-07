@@ -1,36 +1,41 @@
-.main-register{
+.main_about{
     background-color: #343434;
-    height: 110vh;
+    height: 100vh;
+    color: white;
 }
 
-.main-register-1{
+.main_about_1{
     padding-top: 20vh;
 }
 
-.main-register-1 img{
-    width: 70%;
+.main_about_1 img{
+    width: 75%;
 }
 
-.main-register-2{
+
+.main_about_2{
+    padding-top: 5vh;
+    font-size: 1.25rem;
+}
+
+.MV_section{
+    background-color: #1373FF;
+    height: 100vh;
     padding-top: 10vh;
 }
 
-.logo{
-    width: 50%;
-    height: auto;
-}
-
-.card-register{
+.card_MV{
     border: solid;
     border-color: #E2F4F6;
     border-width: 15px;
     background-color: #F2F9FF;
 }
 
-.card-inner-register{
+.card_inner_MV{
     border-radius: 5px;
     border-color: black;
     outline-style: solid;
+    color: black;
 }
 
 @media (max-width: 1200px) {

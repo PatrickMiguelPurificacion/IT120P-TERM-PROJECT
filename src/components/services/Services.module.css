@@ -1,4 +1,4 @@
-.main-services{
+.main_services{
     background:
     linear-gradient(
       rgba(0, 0, 0, 0.5),
@@ -11,16 +11,16 @@
     height: 100vh;
 }
 
-.main-services-1{
+.main_services_1{
     padding-top: 5vh;
     font-size: 10rem;
 }
 
-.main-services-2{
+.main_services_2{
     padding-top: 10vh;
 }
 
-.main-services-2 img{
+.main_services_2 img{
     width: 80%;
 }
 
@@ -29,7 +29,7 @@
     height: 94vh;
 }
 
-.services-header{
+.services_header{
     padding: 4vh;
     background-color: #1373FF;
     text-align: center;

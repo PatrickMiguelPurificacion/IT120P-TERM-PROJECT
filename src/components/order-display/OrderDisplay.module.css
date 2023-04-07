@@ -8,7 +8,7 @@
   color:white;
   height: 130vh;
 }
-h1.a{
+.a {
   text-align: left;
   color:black;
   background-color:blue;
@@ -16,19 +16,17 @@ h1.a{
   font-weight: bolder;
   font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 20px;
+  padding-left: 200px;
 }
-h2.b{
-  text-align:center;
-  margin: 0 auto;
-  font-style: bold;
-  font-family: Arial, Helvetica, sans-serif;
-  inline-size: 30%;
-  color:red;
-  font-size: 3em;
-  font-weight: bolder;
+.logo {
+  display: flex;
+  justify-content: center;
+  width: 50%;
+  height: auto;
+  margin: auto;
 }
 
-table{
+.OrderDisplay table{
   width: 100%;
   border-collapse: collapse;
   margin: 0 auto;
@@ -36,30 +34,30 @@ table{
   
 }
 
-th{
+.OrderDisplay th{
   color:white;
   font-weight: 900;
   font-family: Impact;
   font-size: 1.5em;
   font-style: italic;
 }
-td{
+.OrderDisplay td{
   color:black;
   font-weight:600;
   font-family: Arial, Helvetica, sans-serif;
 }
-th,td{
+.OrderDisplay th,.OrderDisplay td{
   text-align: center;
   padding: 15px;
 }
 
-tr:nth-child(even){
+.OrderDisplay tr:nth-child(even){
   background-color:grey;
 }
-tr:nth-child(odd){
+.OrderDisplay tr:nth-child(odd){
   background-color:white;
 }
-p.pending{
+.pending {
   background-color: yellow;
   inline-size: 70%;
   font-size: larger;
@@ -67,7 +65,7 @@ p.pending{
   text-align: center;
   margin:auto;
 }
-p.done{
+.done {
   background-color: green;
   inline-size: 70%;
   font-size: larger;

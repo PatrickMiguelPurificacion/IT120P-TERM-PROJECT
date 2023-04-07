@@ -1,43 +1,56 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import './App.css'
+import './index.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import wcmatch from 'wildcard-match'
 import Home from './home/Home'
 import About from './about/About'
 import Login from './login/Login'
 import Register from './register/Register'
 import Services from './services/Services'
 import Error from './error/Error'
-import OrderDisplay from './OrderDisplay/OrderDisplay'
-import OrderPage from './OrderPage/OrderPage'
+import Employee from './employee/Employee'
+import EmployeeView from './employee-view/EmployeeView'
+import EmployeeDisplay from './employee-display/EmployeeDisplay'
+import EmployeeLog from './employee-log/EmployeeLog'
+import OrderPage from './order-page/OrderPage'
+import OrderDisplay from './order-display/OrderDisplay'
+import StockPage from './stock-page/StockPage'
+import StockDisplay from './stock-display/StockDisplay'
 
 function App() {
 
     let navbar = document.getElementById("main-navigation");
     let sticky = 0;
+    let location = window.location.pathname;
+    const isDashboard = wcmatch('/dashboard/*')
 
-  useEffect(()=>{
+    useEffect(()=>{
         
-    navbar = document.getElementById("main-navigation");
-    sticky = navbar!.offsetTop;
-    window.addEventListener('scroll', handleSticky);
+        if(!isDashboard(location)){
+            navbar = document.getElementById("main-navigation");
+            sticky = navbar!.offsetTop;
+            window.addEventListener('scroll', handleSticky);
+        }
+        
 
-  }, []);
-  
-  const handleSticky = () => {
+    }, []);
+    
+    const handleSticky = () => {
 
-    if(window.scrollY > sticky){
-        navbar?.classList.add("sticky");
-    }else{
-        navbar?.classList.remove("sticky");
+        if(window.scrollY > sticky){
+            navbar?.classList.add("sticky");
+        }else{
+            navbar?.classList.remove("sticky");
+        }
+
     }
-
-  }
 
   return (
     <>
-      <nav id="main-navigation" className="navbar navbar-expand-lg navbar-dark navigation">
+        {!isDashboard(location) && <nav id="main-navigation" className="navbar navbar-expand-lg navbar-dark navigation">
             <div className="container-fluid">
-                <a className="navbar-brand" href="#"><img src="../src/assets/logo.png"/></a>
+                <a className="navbar-brand" href="/"><img src="../src/assets/logo.png"/></a>
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span className="navbar-toggler-icon"></span>
                 </button>
@@ -62,7 +75,7 @@ function App() {
                         <a className="nav-link active" href="/register">Register</a>
                     </li>
                     <li className="nav-item">
-                        <a className="nav-link active" href="/profile">Profile</a>
+                        <a className="nav-link active" href="/dashboard/employee-view">Dashboard</a>
                     </li>
                     {/*<li className="nav-item dropdown">
                     <a className="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -82,7 +95,8 @@ function App() {
                 </div>
             </div>
         </nav>
-
+}
+        
         <Router>
             <Routes>
                 <Route path="/" element={<Home />}/>
@@ -92,7 +106,19 @@ function App() {
                 <Route path="/services" element={<Services />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                {/*<Route path="/profile" element={} />*/}
+                
+                <Route path="/dashboard/employee" element={<Employee />} />
+                
+                <Route path="/dashboard/employee-view" element={<EmployeeView />} />
+                <Route path="/dashboard/employee-display" element={<EmployeeDisplay />} />
+                <Route path="/dashboard/employee-log" element={<EmployeeLog />} />
+
+                <Route path="/dashboard/order" element={<OrderPage />} />
+                <Route path="/dashboard/order-display" element={<OrderDisplay />} />
+                
+                <Route path="/dashboard/stock" element={<StockPage />} />
+                <Route path="/dashboard/stock-display" element={<StockDisplay />} />
+
                 <Route path="*" element={<Error />} />
             </Routes>
         </Router>      
