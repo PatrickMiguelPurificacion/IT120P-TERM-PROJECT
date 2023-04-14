@@ -26,6 +26,69 @@ function Register(){
 
     const { createUser, currentEmployee } = UserAuth();
 
+    const isValidFirstName = (firstName: string) =>{
+   
+        const firstNamePattern = /^[a-zA-Z]+$/;
+
+        if(firstName.length < 4){
+
+            return false;
+
+        }
+
+        return firstNamePattern.test(firstName);
+        
+    }
+    
+    const isValidLastName = (lastName: string) =>{
+       
+        const lastNamePattern = /^[a-zA-Z]+$/;
+
+        if(lastName.length < 4){
+
+            return false;
+
+        }
+
+        return lastNamePattern.test(lastName);
+        
+    }
+    
+    const isValidEmail = (email: string) =>{
+       
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailPattern.test(email);
+        
+    }
+    
+    const isValidGender = (gender: string) =>{
+       
+        const validGenders = ["male", "female", "other"];
+        return validGenders.includes(gender.toLowerCase());
+        
+    }
+    
+    const isValidPassword = (password: string) =>{
+       
+        const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])(?!.*\s).{8,}$/;
+        return passwordPattern.test(password);
+        
+    }
+    
+    const isValidContact = (contact: string) =>{
+       
+        const contactPattern = /^[0-9]{10}$/;
+        return contactPattern.test(contact);
+        
+    }
+    
+    const isValidAddress = (address: string) =>{
+       
+        const addressPattern = /^[a-zA-Z0-9\s,-]+$/;
+        return addressPattern.test(address);
+        
+    }
+
     const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
 
         e.preventDefault();
@@ -33,13 +96,58 @@ function Register(){
 
         try{
 
-            await createUser(employee.firstName, employee.lastName, employee.email, employee.password, employee.gender, employee.contact, employee.address);
+            const {
+                firstName,
+                lastName,
+                email,
+                gender,
+                password,
+                contact,
+                address
+            } = employee;
+
+            // Validate first name
+            if (!firstName || firstName === '' || firstName === null || firstName === undefined || !isValidFirstName(firstName)) {
+                return setErrorMessage('Please enter a valid first name (at least 4 characters)');
+            }
+    
+            // Validate last name
+            if (!lastName || lastName === '' || lastName === null || lastName === undefined || !isValidLastName(lastName)) {
+                return setErrorMessage('Please enter a valid last name (at least 4 characters)');
+            }
+    
+            // Validate email
+            if (!email || email === '' || email === null || email === undefined || !isValidEmail(email)) {
+                return setErrorMessage('Please enter a valid email address)');
+            }
+    
+            // Validate gender
+            if (!gender || gender === 'Select Gender' || gender === null || gender === undefined || !isValidGender(gender)) {
+                return setErrorMessage('Please select a valid gender');
+            }
+    
+            // Validate password
+            if (password && password === '' || password === null || password === undefined || !isValidPassword(password)) {
+                return setErrorMessage('Please enter a valid password (at least 8 characters, 1 digit, 1 lowercase, 1 uppercase, 1 special character, and no whitespace)');
+            }
+    
+            // Validate contact
+            if (!contact || contact === '' || contact === null || contact === undefined || !isValidContact(contact)) {
+                return setErrorMessage('Please enter a valid contact number');
+            }
+    
+            // Validate address
+            if (!address || address=== '' || address === null || address === undefined || !isValidAddress(address)) {
+                return setErrorMessage('Please enter a valid address');
+            }
+
+            await createUser(firstName, lastName, email, password, gender, contact, address);
             navigate('/home')
 
         }catch(e: unknown){
             
             if(e instanceof Error){
-                setErrorMessage(e.message);
+                return setErrorMessage(e.message);
             }
 
         }
@@ -48,13 +156,9 @@ function Register(){
 
     useEffect(()=>{
 
-        if(employee.firstName && employee.lastName && employee.email && employee.password && employee.gender !== 'Select Gender' && employee.contact && employee.address){
+        if(employee.password === employee.confirmPassword && (employee.password.length > 0 || employee.confirmPassword.length > 0)){
 
-            if(employee.password == employee.confirmPassword){
-
-                setIsValid(true);
-
-            }
+            setIsValid(true);
 
         }else{
 
@@ -62,7 +166,7 @@ function Register(){
 
         }
 
-    },[employee.firstName, employee.lastName, employee.email, employee.password, employee.gender, employee.address])
+    },[employee.password, employee.confirmPassword])
     
     useEffect(() => {
 

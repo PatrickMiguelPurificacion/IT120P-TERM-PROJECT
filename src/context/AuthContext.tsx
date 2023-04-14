@@ -2,7 +2,7 @@ import { EmailAuthProvider, User as FirebaseUser, createUserWithEmailAndPassword
 import { collection, doc, documentId, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore';
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from '../scripts/firebase-init';
-import { StorageAuth } from './SotrageContext';
+import { StorageAuth } from './StorageContext';
 
 interface User extends FirebaseUser{
     firstName: string;

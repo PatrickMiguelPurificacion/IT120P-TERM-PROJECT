@@ -24,13 +24,17 @@ function Login(){
 
         try{
 
-            await signIn(email, password);
+            await signIn(email, password).catch((error)=>{
+
+                return setErrorMessage(error.message);
+
+            });
             navigate('/home')
 
         }catch(e: unknown){
             
             if(e instanceof Error){
-                setErrorMessage(e.message);
+                return setErrorMessage(e.message);
             }
 
         }
