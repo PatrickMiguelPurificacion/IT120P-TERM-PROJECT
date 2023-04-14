@@ -17,13 +17,38 @@ import OrderPage from './order-page/OrderPage'
 import OrderDisplay from './order-display/OrderDisplay'
 import StockPage from './stock-page/StockPage'
 import StockDisplay from './stock-display/StockDisplay'
+import { UserAuth } from '../context/AuthContext'
 
 function App() {
 
     let navbar = document.getElementById("main-navigation");
     let sticky = 0;
     let location = window.location.pathname;
-    const isDashboard = wcmatch('/dashboard/*')
+    const isDashboard = wcmatch('/dashboard/*');
+    
+    const {currentEmployee, logout} = UserAuth();
+
+    const handleLogout = async () => {
+
+        try {
+
+            await logout();
+
+          } catch (error) {
+            console.error('Error logging out:', error);
+          }
+
+    }
+
+    const handleSticky = () => {
+
+        if(window.scrollY > sticky){
+            navbar?.classList.add("sticky");
+        }else{
+            navbar?.classList.remove("sticky");
+        }
+
+    }
 
     useEffect(()=>{
         
@@ -35,16 +60,6 @@ function App() {
         
 
     }, []);
-    
-    const handleSticky = () => {
-
-        if(window.scrollY > sticky){
-            navbar?.classList.add("sticky");
-        }else{
-            navbar?.classList.remove("sticky");
-        }
-
-    }
 
   return (
     <>
@@ -68,15 +83,26 @@ function App() {
                     <li className="nav-item">
                         <a className="nav-link active" href="/services">Laundry Services</a>
                     </li>
-                    <li className="nav-item">
-                        <a className="nav-link active" href="/login">Login</a>
-                    </li>
-                    <li className="nav-item">
-                        <a className="nav-link active" href="/register">Register</a>
-                    </li>
-                    <li className="nav-item">
-                        <a className="nav-link active" href="/dashboard/employee-view">Dashboard</a>
-                    </li>
+                    {!currentEmployee && 
+                        <>
+                            <li className="nav-item">
+                                <a className="nav-link active" href="/login">Login</a>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link active" href="/register">Register</a>
+                            </li>
+                        </>
+                    }
+                    {currentEmployee &&
+                        <>
+                            <li className="nav-item">
+                                <a className="nav-link active" href="/dashboard/employee-display">{currentEmployee.firstName}</a>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link active" href="/home" onClick={handleLogout}>Logout</a>
+                            </li>
+                        </>
+                    }
                     {/*<li className="nav-item dropdown">
                     <a className="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Employee
@@ -95,8 +121,7 @@ function App() {
                 </div>
             </div>
         </nav>
-}
-        
+        }
         <Router>
             <Routes>
                 <Route path="/" element={<Home />}/>
@@ -121,7 +146,7 @@ function App() {
 
                 <Route path="*" element={<Error />} />
             </Routes>
-        </Router>      
+        </Router>
     </>
   )
 }

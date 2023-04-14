@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom'
 import HomeCSS from './Home.module.css'
+import { UserAuth } from '../../context/AuthContext'
 
 function Home(){
+
+    const {currentEmployee} = UserAuth();
     
     return(
         <>
@@ -12,8 +15,12 @@ function Home(){
                             <img src="../src/assets/logo.png"/>
                             <p className="p-5">Welcome to the employee management system of FabricFinesse. Please login to start working!</p>
                             <div className="p-5">
-                                <Link to="/login"><button type="button" className="btn btn-primary">LOGIN</button></Link>
-                                <Link to="/about"><button type="button" className="btn btn-primary">LEARN MORE</button></Link>
+                                {currentEmployee ? 
+                                    <Link to="/dashboard/employee-display" onClick={window.location.reload}><button type="button" className="btn btn-primary">PROFILE</button></Link>
+                                :
+                                    <Link to="/login" onClick={window.location.reload}><button type="button" className="btn btn-primary">LOGIN</button></Link>
+                                }
+                                <Link to="/about" onClick={window.location.reload}><button type="button" className="btn btn-primary">LEARN MORE</button></Link>
                             </div>
                         </div>
                         <div className={"col-md-6 text-center " + HomeCSS.main_home_2}>
