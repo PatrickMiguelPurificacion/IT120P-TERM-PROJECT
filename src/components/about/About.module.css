@@ -1,6 +1,6 @@
 .main_about{
     background-color: #343434;
-    height: 100vh;
+    height: inherit;
     color: white;
 }
 
