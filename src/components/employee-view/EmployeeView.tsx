@@ -1,20 +1,22 @@
 import React, { FormEventHandler, useEffect, useRef, useState } from 'react'
 import EmployeeViewCSS from './EmployeeView.module.css'
 import Employee from '../employee/Employee';
-import { UserAuth } from '../../context/AuthContext';
+import { UserAuth } from '../../context/UserContext';
 import { StorageAuth } from '../../context/StorageContext';
+import Alert from '../alerts/Alerts';
+import FormValidator from '../../scripts/formValidator';
 
 const Empview = () => {
 
-  const [showError, setShowError] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('Error.');
-  const [successMessage, setSuccessMessage] = useState('Success.');
+  const [alertMessage, setAlertMessage] = useState({type: '', message:'', show: false});
+  const [refreshCounter, setRefreshCounter] = useState(0);
 
   const [isFileValid, setIsFileValid] = useState(true);
   const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [newPassword, setNewPassword]= useState('');
 
-  const {currentEmployee, updateUser} = UserAuth();
+  const {currentEmployee, getEmployee, updateUser, updateUserPassword} = UserAuth();
+  const formValidator = new FormValidator();
   const [employeeUpdate, setEmployeeUpdate] = useState<{
     uuid: string;
     firstName: string;
@@ -55,7 +57,7 @@ const Empview = () => {
       }else{
   
         setIsFileValid(false);
-        return setErrorMessage("File must be an image that is less than 5MB.");
+        return setAlertMessage({type: 'error', message: 'File must be an image that is less than 5MB.', show: true});
   
       }
 
@@ -65,80 +67,10 @@ const Empview = () => {
 
   }
 
-  const isValidFirstName = (firstName: string) =>{
-   
-    const firstNamePattern = /^[a-zA-Z]+$/;
-
-    if(firstName.length < 4){
-
-        return false;
-
-    }
-
-    return firstNamePattern.test(firstName);
-    
-}
-
-const isValidLastName = (lastName: string) =>{
-   
-    const lastNamePattern = /^[a-zA-Z]+$/;
-
-    if(lastName.length < 4){
-
-        return false;
-
-    }
-
-    return lastNamePattern.test(lastName);
-    
-}
-
-  const isValidEmail = (email: string) =>{
-   
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailPattern.test(email);
-    
-  }
-
-  const isValidGender = (gender: string) =>{
-   
-    const validGenders = ["male", "female", "other"];
-    return validGenders.includes(gender.toLowerCase());
-    
-  }
-
-  const isValidPassword = (password: string) =>{
-   
-    const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])(?!.*\s).{8,}$/;
-    return passwordPattern.test(password);
-    
-  }
-
-  const isValidContact = (contact: string) =>{
-   
-    const contactPattern = /^[0-9]{10}$/;
-    return contactPattern.test(contact);
-    
-  }
-
-  const isValidAddress = (address: string) =>{
-   
-    const addressPattern = /^[a-zA-Z0-9\s,-]+$/;
-    return addressPattern.test(address);
-    
-  }
-
-  const isValidManagerID = (managerID: number) =>{
-   
-    const managerIDPattern = /^[0-9]+$/;
-    return managerIDPattern.test(managerID.toString());
-    
-  }
-
   const updateEmployee: FormEventHandler<HTMLFormElement> = async (e) => {
     
     e.preventDefault();
-    setErrorMessage('');
+    setAlertMessage({type: '', message: '', show: false});
 
     try {
       const {
@@ -156,59 +88,95 @@ const isValidLastName = (lastName: string) =>{
       } = employeeUpdate;
 
         // Validate first name
-        if (!firstName || firstName === '' || firstName === null || firstName === undefined || !isValidFirstName(firstName)) {
-          return setErrorMessage('Please enter a valid first name (at least 4 characters)');
+        if (!firstName || firstName === '' || firstName === null || firstName === undefined || !formValidator.isValidFirstName(firstName)) {
+            return setAlertMessage({type: 'error', message: 'Please enter a valid first name (at least 4 characters)', show: true});
         }
 
         // Validate last name
-        if (!lastName || lastName === '' || lastName === null || lastName === undefined || !isValidLastName(lastName)) {
-          return setErrorMessage('Please enter a valid last name (at least 4 characters)');
+        if (!lastName || lastName === '' || lastName === null || lastName === undefined || !formValidator.isValidLastName(lastName)) {
+            return setAlertMessage({type: 'error', message: 'Please enter a valid last name (at least 4 characters)', show: true});
         }
 
         // Validate email
-        if (!email || email === '' || email === null || email === undefined || !isValidEmail(email)) {
-          return setErrorMessage('Please enter a valid email address');
+        if (!email || email === '' || email === null || email === undefined || !formValidator.isValidEmail(email)) {
+            return setAlertMessage({type: 'error', message: 'Please enter a valid email address', show: true});
         }
 
         // Validate gender
-        if (!gender || gender === 'Select Gender' || gender === null || gender === undefined || !isValidGender(gender)) {
-          return setErrorMessage('Please select a valid gender');
+        if (!gender || gender === 'Select Gender' || gender === null || gender === undefined || !formValidator.isValidGender(gender)) {
+            return setAlertMessage({type: 'error', message: 'Please select a valid gender', show: true});
         }
 
         // Validate password
-        if (password && password === '' || password === null || password === undefined || !isValidPassword(password)) {
-          return setErrorMessage('Please enter a valid password (at least 8 characters, 1 digit, 1 lowercase, 1 uppercase, 1 special character, and no whitespace)');
+        if (password && password === '' || password === null || password === undefined || !formValidator.isValidPassword(password)) {
+            return setAlertMessage({type: 'error', message: 'Please enter a valid password (at least 8 characters, 1 digit, 1 lowercase, 1 uppercase, 1 special character, and no whitespace)', show: true});
         }
 
         // Validate contact
-        if (!contact || contact === '' || contact === null || contact === undefined || !isValidContact(contact)) {
-          return setErrorMessage('Please enter a valid contact number');
+        if (!contact || contact === '' || contact === null || contact === undefined || !formValidator.isValidContact(contact)) {
+            return setAlertMessage({type: 'error', message: 'Please enter a valid contact number', show: true});
         }
 
         // Validate address
-        if (!address || address=== '' || address === null || address === undefined || !isValidAddress(address)) {
-          return setErrorMessage('Please enter a valid address');
+        if (!address || address=== '' || address === null || address === undefined || !formValidator.isValidAddress(address)) {
+            return setAlertMessage({type: 'error', message: 'Please enter a valid address', show: true});
         }
 
         // Validate manager ID
-        if (!managerID || managerID < 0 || managerID === null || managerID === undefined || !isValidManagerID(managerID)) {
-          return setErrorMessage('Please enter a valid manager ID');
+        if (!managerID || managerID < 0 || managerID === null || managerID === undefined || !formValidator.isValidManagerID(managerID)) {
+            return setAlertMessage({type: 'error', message: 'Please enter a valid manager ID', show: true});
         }
 
         if (profilePicture !== null) {
           
-          await updateUser(currentEmployee!.uuid, firstName, lastName, email, gender, password, contact, address, role, managerID, profilePicture as File)
+          await updateUser(currentEmployee!.uuid, firstName, lastName, email, gender, password, contact, address, role, managerID, profilePicture as File).then(() =>{
+
+              setRefreshCounter(prevCounter => prevCounter + 1);
+              getEmployee(uuid);
+              return setAlertMessage({type: 'success', message: 'User Updated Successfully.', show: true});
+
+          }).catch((error)=>{
+
+              return setAlertMessage({type: 'error', message: error.message, show: true});
+
+          });
 
         } else {
           
-          await updateUser(currentEmployee!.uuid, firstName, lastName, email, gender, password, contact, address, role, managerID, new File([new Blob(undefined)], ''))
+          await updateUser(currentEmployee!.uuid, firstName, lastName, email, gender, password, contact, address, role, managerID, new File([new Blob(undefined)], '')).then(() =>{
+
+              setRefreshCounter(prevCounter => prevCounter + 1);
+              getEmployee(uuid);
+              return setAlertMessage({type: 'success', message: 'User Updated Successfully.', show: true});
+
+          }).catch((error)=>{
+              
+              return setAlertMessage({type: 'error', message: error.message, show: true});
+
+          });
+
+        }
+
+        if(newPassword && formValidator.isValidPassword(newPassword)){
+
+          await updateUserPassword(email, password, newPassword).then(()=>{
+            
+              setRefreshCounter(prevCounter => prevCounter + 1);
+              getEmployee(uuid);
+              return setAlertMessage({type: 'success', message: 'Password Changed Successfully. Use the new password to update your profile!', show: true});
+
+          }).catch((error)=>{
+
+              return setAlertMessage({type: 'error', message: error.message, show: true});
+
+          });
 
         }
 
       }catch(e: unknown){
           
           if(e instanceof Error){
-              setErrorMessage(e.message);
+              return setAlertMessage({type: 'error', message: e.message, show: true});
           }
 
       }
@@ -251,15 +219,26 @@ const isValidLastName = (lastName: string) =>{
 
   },[currentEmployee])
 
+  useEffect(()=>{
+
+      if(alertMessage.show){
+          setTimeout(()=>{setAlertMessage({type: '', message: '', show: false})}, 5000)
+      }
+
+  },[alertMessage.message]);
+
   return (
     <>
-      <div className={EmployeeViewCSS.Empview}>
-        <Employee />
-        <h1 className={EmployeeViewCSS.a}>EDIT EMPLOYEE INFORMATION PAGE</h1>
+    <Employee />
+      <h1 className={EmployeeViewCSS.a}>EDIT EMPLOYEE INFORMATION PAGE</h1>
+      <div className={EmployeeViewCSS.Empview} key={refreshCounter}>
+        <div style={{position: 'fixed',top: '5%', left: '40%', width: '400px', zIndex:'1000'}}>
+            {alertMessage.show && <Alert type={alertMessage.type}>{alertMessage.message}</Alert>}
+        </div>
         <div className="container">
           <div className="row">
-            <div className="col-md-12 text-center mt-5 mb-5">
-              {currentEmployee ?
+            <div className="col-md-12 text-center mt-5 mb-3">
+              {currentEmployee && currentEmployee!.profilePicture !== '' ?
                 <img src={currentEmployee!.profilePicture} alt="Profile Picture" width="250" height="250"></img>
               :
                 <img src='../src/assets/default-profile-picture.webp' alt="Profile Picture" width="250" height="250"></img>
@@ -267,62 +246,68 @@ const isValidLastName = (lastName: string) =>{
             </div>
           </div>
           <div className="row">           
-            <form onSubmit={updateEmployee}>
-              <div className="col-md-12 text-center">
-                <label htmlFor="ProfilePhoto">Profile Photo: <input type="file" accept="image/*" onChange={onFileSelected} /></label> 
-                <label htmlFor="EmployeeID">Employee ID: <p>{currentEmployee ? currentEmployee!.uuid : ''}</p></label>
+            <form className="form" onSubmit={updateEmployee}>
+              <div className="col-md-12 text-center mt-5">
+                <label htmlFor="ProfilePhoto" className="pe-5">Profile Photo <p><input type="file" accept="image/*" onChange={onFileSelected} /></p></label> 
+                <label htmlFor="EmployeeID" className="ps-5">Employee ID <p>{currentEmployee ? currentEmployee!.uuid : ''}</p></label>
               </div>
               <div className="row mb-5">
-                <div className="col-md-6 text-light pt-5 text-center">
+                <div className="col-md-6 text-light pt-3 text-center">
                     <div className="form-outline">
-                      <label className="form-label" htmlFor="FirstName">First Name:</label>
-                      <input type="text" id="FirstName" name="Name" onChange={(e) => setEmployeeUpdate({ ...employeeUpdate, firstName: e.target.value })} defaultValue={currentEmployee ? currentEmployee!.firstName : ''} />
+                      <label className="form-label" htmlFor="FirstName">First Name</label>
+                      <p><input type="text" className={EmployeeViewCSS.f} id="FirstName" name="Name" onChange={(e) => setEmployeeUpdate({ ...employeeUpdate, firstName: e.target.value })} defaultValue={currentEmployee ? currentEmployee!.firstName : ''} /></p>
                     </div>
                     <div className="form-outline">
-                      <label className="form-label" htmlFor="LastName">Last Name:</label>
-                      <input type="text" id="LastName" name="Name" onChange={(e) => setEmployeeUpdate({ ...employeeUpdate, lastName: e.target.value })} defaultValue={currentEmployee ? currentEmployee!.lastName : ''} />
+                      <label className="form-label" htmlFor="LastName">Last Name</label>
+                      <p><input type="text" className={EmployeeViewCSS.f} id="LastName" name="Name" onChange={(e) => setEmployeeUpdate({ ...employeeUpdate, lastName: e.target.value })} defaultValue={currentEmployee ? currentEmployee!.lastName : ''} /></p>
                     </div>
                     <div className="form-outline">
-                      <label className="form-label" htmlFor="Email">Email:</label>
-                      <input type="text" id="Email" name="Email" onChange={(e) => setEmployeeUpdate({ ...employeeUpdate, email: e.target.value })} defaultValue={currentEmployee ? currentEmployee!.email : ''} />
+                      <label className="form-label" htmlFor="Email">Email</label>
+                      <p><input type="text" className={EmployeeViewCSS.f} id="Email" name="Email" onChange={(e) => setEmployeeUpdate({ ...employeeUpdate, email: e.target.value })} defaultValue={currentEmployee ? currentEmployee!.email : ''} /></p>
                     </div>
                     <div className="form-outline">
-                      <label className="form-label" htmlFor="ManagerID">Manager ID:</label>
-                      <input type="text" inputMode='numeric' pattern="[0-9]+" id="ManagerID" name="ManagerID" onChange={(e) => setEmployeeUpdate({ ...employeeUpdate, managerID: parseInt(e.target.value) })} defaultValue={currentEmployee ? currentEmployee!.managerID : ''} />
+                      <label className="form-label" htmlFor="ManagerID">Manager ID</label>
+                      <p><input type="text" className={EmployeeViewCSS.f} inputMode='numeric' pattern="[0-9]+" id="ManagerID" name="ManagerID" onChange={(e) => setEmployeeUpdate({ ...employeeUpdate, managerID: parseInt(e.target.value) })} defaultValue={currentEmployee ? currentEmployee!.managerID : ''} /></p>
                     </div>
                 </div>
-                <div className="col-md-6 text-light pt-5">
+                <div className="col-md-6 text-light pt-3 text-center">
                     <div className="form-outline">
-                      <label className="form-label" htmlFor="Role">Role:</label>
-                      <input className ={EmployeeViewCSS.f} type="text" id="Role" name="Role:" onChange={(e) => setEmployeeUpdate({ ...employeeUpdate, role: e.target.value })} defaultValue={currentEmployee ? currentEmployee!.role : ''} />
+                      <label className="form-label" htmlFor="Role">Role</label>
+                      <p><input className={EmployeeViewCSS.f} type="text" id="Role" name="Role:" onChange={(e) => setEmployeeUpdate({ ...employeeUpdate, role: e.target.value })} defaultValue={currentEmployee ? currentEmployee!.role : ''} /></p>
                     </div>
                     <div className="form-outline">
-                    <label className="form-label" htmlFor="Gender">Gender:</label>
-                      <select className ={EmployeeViewCSS.f} id="Gender" onChange={(e) => setEmployeeUpdate({ ...employeeUpdate, gender: e.target.value })} defaultValue={currentEmployee ? currentEmployee!.gender : ''}>
-                          <option value="default" disabled>Select Gender</option>
-                          <option value="Male">Male</option>
-                          <option value="Female">Female</option>
-                          <option value="Other">Other</option>
-                      </select>
+                    <label className="form-label" htmlFor="Gender">Gender</label>
+                      <p>
+                        <select className ={EmployeeViewCSS.f} id="Gender" onChange={(e) => setEmployeeUpdate({ ...employeeUpdate, gender: e.target.value })} defaultValue={currentEmployee ? currentEmployee!.gender : ''}>
+                            <option value="default" disabled>Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                      </p>
                     </div>
                     <div className="form-outline">
-                      <label className="form-label" htmlFor="Contact">Contact Number:</label>
-                      <input className ={EmployeeViewCSS.f} type="text" inputMode='numeric' pattern="[0-9]+" id="Contact" name="Contact Number:" onChange={(e) => setEmployeeUpdate({ ...employeeUpdate, contact: e.target.value })} defaultValue={currentEmployee ? currentEmployee!.contact : ''} />
+                      <label className="form-label" htmlFor="Contact">Contact Number</label>
+                      <p><input className ={EmployeeViewCSS.f} type="text" inputMode='numeric' pattern="[0-9]+" id="Contact" name="Contact Number:" onChange={(e) => setEmployeeUpdate({ ...employeeUpdate, contact: e.target.value })} defaultValue={currentEmployee ? currentEmployee!.contact : ''} /></p>
                     </div>
                     <div className="form-outline">
-                      <label className="form-label" htmlFor="Address">Address:</label>
-                      <input className={EmployeeViewCSS.f} type="text" id="Address" name="Address:" onChange={(e) => setEmployeeUpdate({ ...employeeUpdate, address: e.target.value })} defaultValue={currentEmployee ? currentEmployee!.address : ''} />
+                      <label className="form-label" htmlFor="Address">Address</label>
+                      <p><input className={EmployeeViewCSS.f} type="text" id="Address" name="Address:" onChange={(e) => setEmployeeUpdate({ ...employeeUpdate, address: e.target.value })} defaultValue={currentEmployee ? currentEmployee!.address : ''} /></p>
                     </div>
                 </div>
               </div>
               <div className="row">
                 <div className="col text-center">
                     <div className="form-outline">
-                      <label className="form-label" htmlFor="Password">Password:</label>
-                      <input type="password" id="Password" name="Password" onChange={(e) => setEmployeeUpdate({ ...employeeUpdate, password: e.target.value })} defaultValue='' />
+                      <label className="form-label" htmlFor="Password">Password</label>
+                      <p><input type="password" id="Password" name="Password" onChange={(e) => setEmployeeUpdate({ ...employeeUpdate, password: e.target.value })} defaultValue='' /></p>
                     </div>
-                    <div className="form-outline mt-3">
-                      {isPasswordValid && isFileValid ? <input type="submit" className="btn btn-primary" value="Update" /> : <input type="submit" className="btn btn-danger" value="Update" disabled />}
+                    <div className="form-outline">
+                      <label className="form-label" htmlFor="Password">New Password</label>
+                      <p><input type="password" id="NewPassword" name="NewPassword" onChange={(e) => setNewPassword(e.target.value)} placeholder="Change Password" defaultValue='' /></p>
+                    </div>
+                    <div className="form-outline mt-5">
+                      {isPasswordValid && isFileValid ? <button type="submit" className="btn btn-primary">Update</button> : <button type="submit" className="btn btn-danger" value="Update" disabled>Update</button>}
                     </div>
                 </div>
               </div>

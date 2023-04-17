@@ -1,14 +1,13 @@
 import RegisterCSS from './Register.module.css'
-import { UserAuth } from '../../context/AuthContext'
+import { UserAuth } from '../../context/UserContext'
 import { FormEventHandler, useContext, useEffect, useState } from 'react';
 import {Link, useNavigate } from 'react-router-dom'
+import Alert from '../alerts/Alerts';
+import FormValidator from '../../scripts/formValidator';
 
 function Register(){
     
-    const [showError, setShowError] = useState(false);
-    const [showSuccess, setShowSuccess] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('Error.');
-    const [successMessage, setSuccessMessage] = useState('Success.');
+    const [alertMessage, setAlertMessage] = useState({type: '', message:'', show: false});
     const [isValid, setIsValid] = useState(false);
 
     const [employee, setEmployee] = useState({
@@ -23,76 +22,13 @@ function Register(){
     })
 
     const navigate = useNavigate();
-
+    const formValidator = new FormValidator();
     const { createUser, currentEmployee } = UserAuth();
-
-    const isValidFirstName = (firstName: string) =>{
-   
-        const firstNamePattern = /^[a-zA-Z]+$/;
-
-        if(firstName.length < 4){
-
-            return false;
-
-        }
-
-        return firstNamePattern.test(firstName);
-        
-    }
-    
-    const isValidLastName = (lastName: string) =>{
-       
-        const lastNamePattern = /^[a-zA-Z]+$/;
-
-        if(lastName.length < 4){
-
-            return false;
-
-        }
-
-        return lastNamePattern.test(lastName);
-        
-    }
-    
-    const isValidEmail = (email: string) =>{
-       
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailPattern.test(email);
-        
-    }
-    
-    const isValidGender = (gender: string) =>{
-       
-        const validGenders = ["male", "female", "other"];
-        return validGenders.includes(gender.toLowerCase());
-        
-    }
-    
-    const isValidPassword = (password: string) =>{
-       
-        const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])(?!.*\s).{8,}$/;
-        return passwordPattern.test(password);
-        
-    }
-    
-    const isValidContact = (contact: string) =>{
-       
-        const contactPattern = /^[0-9]{10}$/;
-        return contactPattern.test(contact);
-        
-    }
-    
-    const isValidAddress = (address: string) =>{
-       
-        const addressPattern = /^[a-zA-Z0-9\s,-]+$/;
-        return addressPattern.test(address);
-        
-    }
 
     const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
 
         e.preventDefault();
-        setErrorMessage('');
+        setAlertMessage({type: '', message: '', show: false});
 
         try{
 
@@ -107,47 +43,55 @@ function Register(){
             } = employee;
 
             // Validate first name
-            if (!firstName || firstName === '' || firstName === null || firstName === undefined || !isValidFirstName(firstName)) {
-                return setErrorMessage('Please enter a valid first name (at least 4 characters)');
+            if (!firstName || firstName === '' || firstName === null || firstName === undefined || !formValidator.isValidFirstName(firstName)) {
+                return setAlertMessage({type: 'error', message: 'Please enter a valid first name (at least 4 characters)', show: true});
             }
     
             // Validate last name
-            if (!lastName || lastName === '' || lastName === null || lastName === undefined || !isValidLastName(lastName)) {
-                return setErrorMessage('Please enter a valid last name (at least 4 characters)');
+            if (!lastName || lastName === '' || lastName === null || lastName === undefined || !formValidator.isValidLastName(lastName)) {
+                return setAlertMessage({type: 'error', message: 'Please enter a valid last name (at least 4 characters)', show: true});
             }
     
             // Validate email
-            if (!email || email === '' || email === null || email === undefined || !isValidEmail(email)) {
-                return setErrorMessage('Please enter a valid email address)');
+            if (!email || email === '' || email === null || email === undefined || !formValidator.isValidEmail(email)) {
+                return setAlertMessage({type: 'error', message: 'Please enter a valid email address', show: true});
             }
     
             // Validate gender
-            if (!gender || gender === 'Select Gender' || gender === null || gender === undefined || !isValidGender(gender)) {
-                return setErrorMessage('Please select a valid gender');
+            if (!gender || gender === 'Select Gender' || gender === null || gender === undefined || !formValidator.isValidGender(gender)) {
+                return setAlertMessage({type: 'error', message: 'Please select a valid gender', show: true});
             }
     
             // Validate password
-            if (password && password === '' || password === null || password === undefined || !isValidPassword(password)) {
-                return setErrorMessage('Please enter a valid password (at least 8 characters, 1 digit, 1 lowercase, 1 uppercase, 1 special character, and no whitespace)');
+            if (password && password === '' || password === null || password === undefined || !formValidator.isValidPassword(password)) {
+                return setAlertMessage({type: 'error', message: 'Please enter a valid password (at least 8 characters, 1 digit, 1 lowercase, 1 uppercase, 1 special character, and no whitespace)', show: true});
             }
     
             // Validate contact
-            if (!contact || contact === '' || contact === null || contact === undefined || !isValidContact(contact)) {
-                return setErrorMessage('Please enter a valid contact number');
+            if (!contact || contact === '' || contact === null || contact === undefined || !formValidator.isValidContact(contact)) {
+                return setAlertMessage({type: 'error', message: 'Please enter a valid contact number', show: true});
             }
     
             // Validate address
-            if (!address || address=== '' || address === null || address === undefined || !isValidAddress(address)) {
-                return setErrorMessage('Please enter a valid address');
+            if (!address || address=== '' || address === null || address === undefined || !formValidator.isValidAddress(address)) {
+                return setAlertMessage({type: 'error', message: 'Please enter a valid address', show: true});
             }
 
-            await createUser(firstName, lastName, email, password, gender, contact, address);
-            navigate('/home')
+            await createUser(firstName, lastName, email, password, gender, contact, address).then(() =>{
+
+                return setAlertMessage({type: 'success', message: 'Successful Registration.', show: true});
+    
+            }).catch((error)=>{
+    
+                return setAlertMessage({type: 'error', message: error.message, show: true});
+    
+            });
+            navigate('/home');
 
         }catch(e: unknown){
             
             if(e instanceof Error){
-                return setErrorMessage(e.message);
+                return setAlertMessage({type: 'error', message: e.message, show: true});
             }
 
         }
@@ -178,12 +122,21 @@ function Register(){
 
     },[currentEmployee])
 
+    useEffect(()=>{
+
+        if(alertMessage.show){
+            setTimeout(()=>{setAlertMessage({type: '', message: '', show: false})}, 5000)
+        }
+
+    },[alertMessage.message])
+
     return(
         <>
             <div className={RegisterCSS.main_register}>
+                <div style={{position: 'fixed',top: '5%', left: '35%', width: '400px', zIndex:'1000'}}>
+                    {alertMessage.show && <Alert type={alertMessage.type}>{alertMessage.message}</Alert>}
+                </div>
                 <div className="container">
-                    {showError && <div className="alert alert-danger alerts text-center" role="alert">{errorMessage}</div>}              
-                    {showSuccess && <div className="alert alert-success alerts text-center" role="alert">{successMessage}</div>}
                     <div className="row">
                         <div className={"col-md-6 text-center " + RegisterCSS.main_register_1}>
                             <img src="../src/assets/register/main-section-register.jpg" />

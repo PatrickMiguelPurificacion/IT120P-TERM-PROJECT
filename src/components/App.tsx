@@ -17,7 +17,7 @@ import OrderPage from './order-page/OrderPage'
 import OrderDisplay from './order-display/OrderDisplay'
 import StockPage from './stock-page/StockPage'
 import StockDisplay from './stock-display/StockDisplay'
-import { UserAuth } from '../context/AuthContext'
+import { UserAuth } from '../context/UserContext'
 
 function App() {
 

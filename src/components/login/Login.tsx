@@ -1,14 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom'
 import LoginCSS from './Login.module.css'
-import { UserAuth } from '../../context/AuthContext';
+import { UserAuth } from '../../context/UserContext';
 import { FormEventHandler, useEffect, useState } from 'react';
+import Alert from '../alerts/Alerts';
 
 function Login(){
 
-    const [showError, setShowError] = useState(false);
-    const [showSuccess, setShowSuccess] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('Error.');
-    const [successMessage, setSuccessMessage] = useState('Success.');
+    const [alertMessage, setAlertMessage] = useState({type: '', message:'', show: false});
     const [isValid, setIsValid] = useState(false);
     
     const [email, setEmail] = useState('');
@@ -24,9 +22,13 @@ function Login(){
 
         try{
 
-            await signIn(email, password).catch((error)=>{
+            await signIn(email, password).then(() =>{
 
-                return setErrorMessage(error.message);
+                return setAlertMessage({type: 'success', message: 'Sign In Successful.', show: true});
+
+            }).catch((error)=>{
+
+                return setAlertMessage({type: 'error', message: error.message, show: true});
 
             });
             navigate('/home')
@@ -34,7 +36,7 @@ function Login(){
         }catch(e: unknown){
             
             if(e instanceof Error){
-                return setErrorMessage(e.message);
+                return setAlertMessage({type: 'error', message: e.message, show: true});
             }
 
         }
@@ -64,13 +66,22 @@ function Login(){
         }
 
     },[currentEmployee])
+
+    useEffect(()=>{
+
+        if(alertMessage.show){
+            setTimeout(()=>{setAlertMessage({type: '', message: '', show: false})}, 5000)
+        }
+
+    },[alertMessage.message])
     
     return(
         <>
             <div className={LoginCSS.main_login}>
+                <div style={{position: 'fixed',top: '5%', left: '35%', width: '400px', zIndex:'1000'}}>
+                    {alertMessage.show && <Alert type={alertMessage.type}>{alertMessage.message}</Alert>}
+                </div>
                 <div className="container">
-                    {showError && <div className="alert alert-danger alerts text-center" role="alert">{errorMessage}</div>}              
-                    {showSuccess && <div className="alert alert-success alerts text-center" role="alert">{successMessage}</div>}
                     <div className="row">
                         <div className={"col-md-6 text-center " + LoginCSS.main_login_1}>
                             <img src="../src/assets/login/main-section-login.webp" />

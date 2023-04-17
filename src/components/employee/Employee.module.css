@@ -1,6 +1,7 @@
 .wrapper {
     display: flex;
     flex-direction: row;
+    z-index: 500;
   }
   .sidebar {
     display: block;

@@ -1,6 +1,7 @@
 
 .error {
     background: #343434;
+    height: 110vh;
 }
 .page_wrap {
     min-height: 93.6vh;

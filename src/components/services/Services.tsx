@@ -82,7 +82,7 @@ function Services(){
                                                 <p className="mt-4 p-3 ps-5">{item.Procedure}</p>
                                             </div>
                                         </div>
-                                        <div className="row mt-5 p-5 text-center">
+                                        <div className="row p-2 text-center">
                                             <h2>Type of Delivery</h2>
                                             <p className="mt-4 p-3">{item.Delivery}</p>
                                         </div>
@@ -103,14 +103,14 @@ function Services(){
                                         <div className="row mt-5 p-5">
                                             <div className="col-md-6">
                                                 <h2 className="text-center">Service Description</h2>
-                                                <p className="mt-4 p-3">{item.Description}</p>
+                                                <p className="mt-4 p-3 text-justify">{item.Description}</p>
                                             </div>
                                             <div className="col-md-6">
                                                 <h2 className="text-center">Procedure</h2>
                                                 <p className="mt-4 p-3 ps-5">{item.Procedure}</p>
                                             </div>
                                         </div>
-                                        <div className="row mt-5 p-5 text-center">
+                                        <div className="row p-2 text-center">
                                             <h2>Type of Delivery</h2>
                                             <p className="mt-4 p-3">{item.Delivery}</p>
                                         </div>

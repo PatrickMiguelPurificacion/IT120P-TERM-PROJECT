@@ -1,110 +1,30 @@
 .log {
     background:linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)
     ), url('../../assets/employee-log/background.png');
-    background-position: center;
-    background-size: 100% 100%;
     background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
     color: white;
-  }
-  
-  .content div {
-    margin-left: 200px;
-    height: 100vh;
-  }
-  
-  @media screen and (max-width: 700px) {
-    div.content {margin-left: 0;}
-  }
-  
-  @media screen and (max-width: 400px) {
-  
-  }
+    height: inherit;
+    padding-left: 300px;
+    padding-right: 200px;
+    padding-bottom: 50px;
+    margin-top: -0.8vh;
+}
 
-  .profile_picture {
-    display: flex;
-    justify-content: center;
-  }
-
-  .profile_picture img {
-    position: absolute;
-    top: 10%;
+.profile_picture {
     border-radius: 50%;
-    height: 150px;
-  }
-
-  .form_inline {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    position: absolute;
-    left: 50%;
-    top: 30%;
-    flex-direction: column;
-    padding-left: 0;
-  }
-  
-  .form_inline label {
-    margin: 5px 10px 5px 0;
-    font-weight: 700;
-  }
-
-  .form_inline input {
-    vertical-align: middle;
-    margin: 5px 10px 5px 0;
-    padding: 10px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-  }
-  
-  .form_inline button {
-    padding: 10px 20px;
-    background-color: dodgerblue;
-    border: 1px solid #ddd;
-    color: white;
-  }
-  
-  .form_inline button:hover {
-    background-color: royalblue;
-  }
-  
-  @media (max-width: 800px) {
-    .form_inline input {
-      margin: 10px 0;
-    }
-  
-    .form_inline {
-      flex-direction: column;
-      align-items: stretch;
-    }
-  }
-
-  .button {
-    background-color: red !important;
-    border-color: red !important;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-  } /* form end */
-
-  .table_responsive table{
-    justify-content: center;
-    margin: auto;
+    height: 250px;
     width: 250px;
-    background-color: white !important;
-    color: red;
-  }
+    margin-top: 7vh;
+    margin-bottom: 5vh;
+}
 
-  .table_responsive th, .table_responsive td {
-    text-align: left;
-    padding: 8px;
-  }
-
-  .table_responsive tr:nth-child(even) {
-    background-color: #f2f2f2 !important;
-  }
-  
+.a {
+    text-align: center;
+    color: black;
+    background-color:#1A50DD;
+    font-weight: bolder;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+}
