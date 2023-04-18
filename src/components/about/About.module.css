@@ -38,6 +38,12 @@
     color: black;
 }
 
+.text_justify {
+    text-align: justify;
+    display: inline-block;
+    text-align-last: left;
+}
+
 @media (max-width: 1200px) {
 
 }

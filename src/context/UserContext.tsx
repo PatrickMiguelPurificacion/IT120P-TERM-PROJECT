@@ -52,8 +52,8 @@ interface ContactEmployee{
 interface LogEmployee{
     uuid: string;
     fullName: string;
-    timeIn: Date | null;
-    timeOut: Date | null;
+    timeIn: Date;
+    timeOut: Date;
 }
   
 export const UserContext = createContext<{
@@ -198,38 +198,51 @@ export const AuthContextProvider = ({children}: {children: ReactNode}) =>{
         role: string,
         managerID: number,
         profilePicture?: File | null | undefined
-        ) =>{
+    ) =>{
         
-            try {
-                const employee = {
-                    First_Name: firstName,
-                    Last_Name: lastName,
-                    Email: email,
-                    Gender: gender,
-                    Contact: contact,
-                    Address: address,
-                    Role: role,
-                    Manager_ID: managerID
-                }
-        
-                const auth = getAuth();
-                const credential = EmailAuthProvider.credential(email, password);
-        
-                await reauthenticateWithCredential(auth.currentUser!, credential);
-                const employeesCollection = collection(db, 'Employees');
-                const employeeDocRef = doc(employeesCollection, uuid);
-        
-                if(profilePicture?.size !== 0){
-                    await updateProfilePicture(uuid, profilePicture!);
-                }
-        
-                await updateDoc(employeeDocRef, employee);
-                await getEmployee(uuid);
-        
-            } catch (error) {
-                console.error(error);
-                throw error;
+        try {
+            const employee = {
+                First_Name: firstName,
+                Last_Name: lastName,
+                Email: email,
+                Gender: gender,
+                Contact: contact,
+                Address: address,
+                Role: role,
+                Manager_ID: managerID
             }
+    
+            const auth = getAuth();
+            const credential = EmailAuthProvider.credential(email, password);
+    
+            await reauthenticateWithCredential(auth.currentUser!, credential);
+            const employeesCollection = collection(db, 'Employees');
+            const employeeDocRef = doc(employeesCollection, uuid);
+    
+            if(profilePicture?.size !== 0){
+                await updateProfilePicture(uuid, profilePicture!);
+            }
+    
+            await updateDoc(employeeDocRef, employee);
+            await getEmployee(uuid);
+            setUpdateEmployee({
+                uuid: uuid,
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                gender: gender,
+                password: "",
+                contact: contact,
+                address: address,
+                role: role,
+                managerID: managerID,
+                profilePicture: null
+            })
+    
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
 
     }
 
@@ -301,6 +314,13 @@ export const AuthContextProvider = ({children}: {children: ReactNode}) =>{
             const ticketsDocRef = doc(ticketsCollection, new Date().toLocaleDateString().replaceAll('/','-'));
     
             await setDoc(ticketsDocRef, ticketRequest, {merge: true});
+            setContactEmployee({
+                uuid: uuid,
+                fullName: fullName,
+                email: email,
+                subject: subject,
+                message: message
+            })
     
         } catch (error) {
             console.error(error);
@@ -398,7 +418,7 @@ export const AuthContextProvider = ({children}: {children: ReactNode}) =>{
                                     uuid: uuid,
                                     fullName: doc.data()[uuid].Employee_Name,
                                     timeIn: doc.data()[uuid].Time_In.toDate(),
-                                    timeOut: null
+                                    timeOut: new Date(0)
                                 },
                             ]);
                         }

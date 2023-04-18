@@ -15,7 +15,7 @@ const Empview = () => {
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [newPassword, setNewPassword]= useState('');
 
-  const {currentEmployee, getEmployee, updateUser, updateUserPassword} = UserAuth();
+  const {currentEmployee, updateEmployee, getEmployee, updateUser, updateUserPassword} = UserAuth();
   const formValidator = new FormValidator();
   const [employeeUpdate, setEmployeeUpdate] = useState<{
     uuid: string;
@@ -67,25 +67,25 @@ const Empview = () => {
 
   }
 
-  const updateEmployee: FormEventHandler<HTMLFormElement> = async (e) => {
+  const updateEmployeeInfo: FormEventHandler<HTMLFormElement> = async (e) => {
     
     e.preventDefault();
     setAlertMessage({type: '', message: '', show: false});
 
     try {
-      const {
-        uuid,
-        firstName,
-        lastName,
-        email,
-        gender,
-        password,
-        contact,
-        address,
-        role,
-        managerID,
-        profilePicture
-      } = employeeUpdate;
+        const {
+          uuid,
+          firstName,
+          lastName,
+          email,
+          gender,
+          password,
+          contact,
+          address,
+          role,
+          managerID,
+          profilePicture
+        } = employeeUpdate;
 
         // Validate first name
         if (!firstName || firstName === '' || firstName === null || firstName === undefined || !formValidator.isValidFirstName(firstName)) {
@@ -173,13 +173,13 @@ const Empview = () => {
 
         }
 
-      }catch(e: unknown){
-          
-          if(e instanceof Error){
-              return setAlertMessage({type: 'error', message: e.message, show: true});
-          }
+    }catch(e: unknown){
+        
+        if(e instanceof Error){
+            return setAlertMessage({type: 'error', message: e.message, show: true});
+        }
 
-      }
+    }
 
   }
 
@@ -217,7 +217,7 @@ const Empview = () => {
 
     }
 
-  },[currentEmployee])
+  },[currentEmployee, updateEmployee])
 
   useEffect(()=>{
 
@@ -246,7 +246,7 @@ const Empview = () => {
             </div>
           </div>
           <div className="row">           
-            <form className="form" onSubmit={updateEmployee}>
+            <form className="form" onSubmit={updateEmployeeInfo}>
               <div className="col-md-12 text-center mt-5">
                 <label htmlFor="ProfilePhoto" className="pe-5">Profile Photo <p><input type="file" accept="image/*" onChange={onFileSelected} /></p></label> 
                 <label htmlFor="EmployeeID" className="ps-5">Employee ID <p>{currentEmployee ? currentEmployee!.uuid : ''}</p></label>

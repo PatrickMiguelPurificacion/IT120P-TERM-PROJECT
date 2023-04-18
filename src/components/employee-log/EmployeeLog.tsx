@@ -4,6 +4,7 @@ import { FormEventHandler, useEffect, useState } from 'react';
 import { UserAuth } from '../../context/UserContext';
 import { format } from 'date-fns';
 import Alert from '../alerts/Alerts';
+import ReactPaginate from 'react-paginate';
 
 const EmployeeLog = () => {
 
@@ -19,11 +20,20 @@ const EmployeeLog = () => {
         timeIn: null,
         timeOut: null
     });
+
+    const [currentLogs, setCurrentLogs] = useState([{
+        uuid: '',
+        fullName: '',
+        timeIn: new Date(0),
+        timeOut: new Date(0)
+    }]);
     
     const [alertMessage, setAlertMessage] = useState({type: '', message:'', show: false});
     const [currentDate, setCurrentDate] = useState(new Date().toLocaleDateString());
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
     const [refreshCounter, setRefreshCounter] = useState(0);
+    const [pageCount, setPageCount] = useState(0);
+    const [itemOffset, setItemOffset] = useState(0);
 
     const submitLog: FormEventHandler<HTMLFormElement> = async (e) =>{
 
@@ -61,6 +71,14 @@ const EmployeeLog = () => {
 
     }
 
+    const handlePageClick = (event: { selected: number; }) => {
+      
+      const newOffset = event.selected * 5 % logEmployee!.length;
+      console.log(`User requested page number ${event.selected}, which is offset ${newOffset}`);
+      setItemOffset(newOffset);
+
+    }
+
     useEffect(() =>{
 
       setTimeout(() => {
@@ -79,8 +97,8 @@ const EmployeeLog = () => {
           setEmployeeLog({
               uuid: currentEmployee ? currentEmployee.uuid : '',
               fullName: currentEmployee!.firstName + " " + currentEmployee!.lastName,
-              timeIn: new Date(),
-              timeOut: new Date()
+              timeIn: null,
+              timeOut: null
           });
   
       }
@@ -105,7 +123,19 @@ const EmployeeLog = () => {
 
     },[currentEmployee]);
 
+    useEffect(() => {
 
+      if(logEmployee){
+
+          const endOffset = itemOffset + 5;
+          console.log(`Loading items from ${itemOffset} to ${endOffset}`);
+          setCurrentLogs(logEmployee!.slice(itemOffset, endOffset));
+          setPageCount(Math.ceil(logEmployee!.length / 5));
+
+      }
+      
+    }, [logEmployee, itemOffset, 5]);
+    
     return (
       <>
         <Employee />
@@ -162,33 +192,63 @@ const EmployeeLog = () => {
                 </div>
                 <button type="submit" className="btn btn-primary mt-5 mb-5 p-3">SUBMIT</button>
               </form>
-              <div>
-                <table className="table table-light table-responsive-md">
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Start Time</th>
-                      <th>End Time</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {logEmployee!.map((log, index)=>{
-                      return(
-                        <tr key={index}>
-                          <td>
-                            {log.timeIn ? log.timeIn.toLocaleDateString() : "Not Available"}
-                          </td>
-                          <td>
-                            {log.timeIn ? log.timeIn.toLocaleTimeString() : "Not Available"}
-                          </td>
-                          <td>
-                            {log.timeOut ? log.timeOut.toLocaleTimeString() : "Not Available"}
-                          </td>
-                        </tr>
-                      )
-                    }).reverse()}
-                  </tbody>
-                </table>
+              <div className="text-center">
+                {currentLogs ?
+                  <>
+                      <table className="table table-light table-responsive-md">
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {currentLogs!.map((log, index)=>{
+                            return(
+                              <tr key={index}>
+                                <td>
+                                  {log.timeIn ? log.timeIn.toLocaleDateString() : "Not Available"}
+                                </td>
+                                <td>
+                                  {log.timeIn ? log.timeIn.toLocaleTimeString() : "Not Available"}
+                                </td>
+                                <td>
+                                  {log.timeOut ? log.timeOut.toLocaleTimeString() : "Not Available"}
+                                </td>
+                              </tr>
+                            )
+                          }).reverse()}
+                        </tbody>
+                      </table>
+                      <ReactPaginate
+                              nextLabel="next >"
+                              onPageChange={handlePageClick}
+                              pageRangeDisplayed={3}
+                              marginPagesDisplayed={2}
+                              pageCount={pageCount}
+                              previousLabel="< previous"
+                              pageClassName="page-item"
+                              pageLinkClassName="page-link"
+                              previousClassName="page-item"
+                              previousLinkClassName="page-link"
+                              nextClassName="page-item"
+                              nextLinkClassName="page-link"
+                              breakLabel="..."
+                              breakClassName="page-item"
+                              breakLinkClassName="page-link"
+                              containerClassName="pagination"
+                              activeClassName="active"
+                              renderOnZeroPageCount={null}
+                            />
+                  </>
+                :
+                  <>
+                      <div className="text-light text-center">
+                        <h1>There are currently no logs at the moment.</h1>
+                      </div>
+                  </>
+                }
               </div>
             </div>
           </div>

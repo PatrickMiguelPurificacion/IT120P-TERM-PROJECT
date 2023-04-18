@@ -3,83 +3,28 @@
 .StockDisplay{
     background:linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)
     ), url('../../assets/stock-display/background.png');
+    background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
-    background-repeat: no-repeat;
-    position: relative;
-    justify-content: center;
+    color: black;
+    height: inherit;
+    padding-left: 300px;
+    padding-right: 200px;
+    padding-bottom: 50px;
+    margin-top: -0.8vh;
     height: 100vh;
 }
 
-.a{
-    font-size: 30px;
-    padding: 20px;
-    padding-left: 200px;
-    font-family: 'Holtwood One SC', serif;
-    text-align: left;
+.a {
+    text-align: center;
     color: black;
-    background-color: blue;
-    inline-size: 100%;
+    background-color:#1A50DD;
+    font-weight: bolder;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
 }
 
-.StockDisplay img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 40%;
-  }
-
-.displayTable{
-    margin-left: auto;
-    margin-right: auto;
-    font-family: 'Holtwood One SC', serif;
-    border-collapse: collapse;
-    width: 70%;
-    text-align: center;
-    top: 20%;
-  }
-
-.displayTable td, .displayTable th{
-    border: 1px solid #ddd;
-    padding-left: 150px;
-    padding-right: 150px;
-    border-collapse: collapse;
+.logo{
+    height: 200px;
+    width: 500px;
 }
-
-.emptyRow{
-    padding-top: 2%;
-}
-
-.full{
-    background-color: green;
-    inline-size: 150%;
-}
-
-.empty{
-    background-color: red;
-    inline-size: 150%;
-}
-
-.displayTable tr:nth-child(even){
-    background-color: lightgray;
-    padding-left: 125px;
-    padding-right: 125px;
-    text-align: center;
-}
-
-.displayTable tr:nth-child(odd){
-    background-color: white;
-    padding-left: 125px;
-    padding-right: 125px;
-    text-align: center;
-}
-
-.displayTable th {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    text-align: center;
-    background-color: lightgray;
-    color: #aa0404;
-  }
-
-  

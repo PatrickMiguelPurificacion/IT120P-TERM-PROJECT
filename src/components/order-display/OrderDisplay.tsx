@@ -1,93 +1,156 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import OrderDisplayCSS from './OrderDisplay.module.css'
 import Employee from '../employee/Employee'
 import logo from '../../assets/order-display/FabricFinesse.png'
+import { InventoryAuth } from '../../context/InventoryContext'
+import ReactPaginate from 'react-paginate'
+import Alert from '../alerts/Alerts'
+import { OrderAuth } from '../../context/OrderContext'
 
 const OrderDisplay = () => {
-  return (
-    <div className={OrderDisplayCSS.OrderDisplay}>
-      <Employee/>
-      <h1 className={OrderDisplayCSS.a}>ORDERS DISPLAY PAGE</h1>
-      <br></br>
-      <br></br>
-      <br></br>
-      <div className={OrderDisplayCSS.logo}>
-        <img src={logo} />
-      </div>
-      <br></br>
-      <br></br>
-      <br></br>
-      <br></br>
-      <table>
-      <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-      </tr>
-        <tr>
-          <th>ORDER ID</th>
-          <th>CUSTOMER NAME</th>
-          <th>STATUS</th>
-        </tr>
-        <tr>
-          <td>1</td>
-          <td>BRAD</td>
-          <td> <p className={OrderDisplayCSS.done}>DONE</p></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>EMILY</td>
-          <td><p className={OrderDisplayCSS.pending}>PENDING</p></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td>AARON</td>
-          <td> <p className={OrderDisplayCSS.done}>DONE</p></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>4</td>
-          <td>JOSH</td>
-          <td><p className={OrderDisplayCSS.pending}>PENDING</p></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>5</td>
-          <td>JEREMEY</td>
-          <td> <p className={OrderDisplayCSS.done}>DONE</p></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>6</td>
-          <td>PAT</td>
-          <td><p className={OrderDisplayCSS.pending}>PENDING</p></td>
-        </tr>
-      </table>
+  
+    const [alertMessage, setAlertMessage] = useState({type: '', message:'', show: false});
+    const [refreshCounter, setRefreshCounter] = useState(0);
+    const [pageCount, setPageCount] = useState(0);
+    const [itemOffset, setItemOffset] = useState(0);
+    const {getOrders, allOrders} = OrderAuth();
+    const [currentOrders, setCurrentOrders] = useState([{
+        id: 0,
+        customerName: "",
+        customerNumber: "",
+        customerAddress: "",
+        dateCreated: new Date(0),
+        dateCompleted: new Date(0),
+        employeeID: 0,
+        instructions: {
+          bleaching: "",
+          dryCleaning: "",
+          drying: "",
+          ironing: "",
+          specialCare: "",
+          stainRemoval: "",
+          storage: "",
+          washing: "",
+          notes: [""]
+        },
+        laundryInfo: {
+          accesories: [""],
+          activeWear: [""],
+          tops: [""],
+          bottoms: [""],
+          dresses: [""],
+          formalWear: [""],
+          sleepWear: [""],
+          swimWear: [""],
+          undergarments: [""],
+          notes: [""],
+        },
+        status: "",
+    }]);
+
+    const handlePageClick = (event: { selected: number; }) => {
       
-    </div>
-  )
+      const newOffset = event.selected * 5 % allOrders!.length;
+      console.log(`User requested page number ${event.selected}, which is offset ${newOffset}`);
+      setItemOffset(newOffset);
+
+    }
+
+    useEffect(()=>{
+
+      getOrders();
+
+    },[allOrders]);
+
+    useEffect(()=>{
+
+      if(alertMessage.show){
+          setTimeout(()=>{setAlertMessage({type: '', message: '', show: false})}, 5000)
+      }
+
+    },[alertMessage.message]);
+
+    useEffect(() => {
+
+        if(allOrders){
+
+            const endOffset = itemOffset + 5;
+            console.log(`Loading items from ${itemOffset} to ${endOffset}`);
+            setCurrentOrders(allOrders!.slice(itemOffset, endOffset));
+            setPageCount(Math.ceil(allOrders!.length / 5));
+
+        }
+
+    }, [itemOffset, 5]);
+
+    return (
+      <>
+        <Employee />
+        <h1 className = {OrderDisplayCSS.a}>ORDERS DISPLAY PAGE</h1>
+        <div className={OrderDisplayCSS.OrderDisplay}  key={refreshCounter}>
+            <div style={{position: 'fixed',top: '5%', left: '40%', width: '400px', zIndex:'1000'}}>
+                {alertMessage.show && <Alert type={alertMessage.type}>{alertMessage.message}</Alert>}
+            </div>
+            <div className="container">
+                <div className="row pt-5">
+                    <img className={"mx-auto d-block " + OrderDisplayCSS.logo} src={logo} />
+                </div>
+                <div className="row mt-5">
+                    {allOrders ?
+                        <>
+                            <table className="table table-light table-bordered table-responsive">
+                                <thead>
+                                    <tr>
+                                      <th>Id</th>
+                                      <th>Customer Name</th>
+                                      <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {currentOrders.map((item, index) =>{
+                                        return(
+                                          <tr key={index}>
+                                              <td>{item.id}</td>
+                                              <td>{item.customerName}</td>
+                                              <td>{item.status}</td>
+                                          </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                            <ReactPaginate
+                              nextLabel="next >"
+                              onPageChange={handlePageClick}
+                              pageRangeDisplayed={3}
+                              marginPagesDisplayed={2}
+                              pageCount={pageCount}
+                              previousLabel="< previous"
+                              pageClassName="page-item"
+                              pageLinkClassName="page-link"
+                              previousClassName="page-item"
+                              previousLinkClassName="page-link"
+                              nextClassName="page-item"
+                              nextLinkClassName="page-link"
+                              breakLabel="..."
+                              breakClassName="page-item"
+                              breakLinkClassName="page-link"
+                              containerClassName="pagination"
+                              activeClassName="active"
+                              renderOnZeroPageCount={null}
+                            />
+                        </>
+                    :
+                        <>
+                            <div className="text-light text-center">
+                              <h1>There are currently no orders at the moment.</h1>
+                            </div>
+                        </>
+                    }
+                </div>
+            </div>
+        </div>
+      </>
+    )
 }
 
 export default OrderDisplay
