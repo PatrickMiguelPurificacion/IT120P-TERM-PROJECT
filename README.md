@@ -64,5 +64,6 @@ This project was created using the following resources:
 
 * Vite
 * React
+* Firebase
 * Node.js
 * npm
