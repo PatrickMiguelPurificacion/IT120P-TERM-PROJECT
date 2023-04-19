@@ -24,14 +24,14 @@ function Login(){
 
             await signIn(email, password).then(() =>{
 
-                return setAlertMessage({type: 'success', message: 'Sign In Successful.', show: true});
+                setAlertMessage({type: 'success', message: 'Sign In Successful.', show: true});
+                navigate('/home')
 
             }).catch((error)=>{
 
-                return setAlertMessage({type: 'error', message: error.message, show: true});
+                setAlertMessage({type: 'error', message: "Wrong email or password.", show: true});
 
             });
-            navigate('/home')
 
         }catch(e: unknown){
             

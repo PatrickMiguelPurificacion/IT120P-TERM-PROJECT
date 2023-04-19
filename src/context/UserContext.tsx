@@ -433,11 +433,18 @@ export const AuthContextProvider = ({children}: {children: ReactNode}) =>{
 
     const signIn = async (email: string, password: string) =>{
 
-        return signInWithEmailAndPassword(auth, email, password).then(async (UserCredentials) =>{
+        try{
+            
+            return signInWithEmailAndPassword(auth, email, password).then(async (UserCredentials) =>{
 
-            await getEmployee(UserCredentials.user.uid);
+                await getEmployee(UserCredentials.user.uid);
 
-        });
+            });
+
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
 
     };
 
