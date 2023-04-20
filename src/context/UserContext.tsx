@@ -331,7 +331,7 @@ export const AuthContextProvider = ({children}: {children: ReactNode}) =>{
     const saveEmployeeLog = async (
         uuid: string,
         fullName: string,
-        timeIn?: Date | null,
+        timeIn: Date,
         timeOut?: Date | null
     ) => {
         try {
@@ -373,7 +373,7 @@ export const AuthContextProvider = ({children}: {children: ReactNode}) =>{
             if (isTimedIn && isTimedOut) {
                 throw new Error('You have already submitted your log for today.');
             }
-    
+
             const logsCollection = collection(db, 'Logs');
             let logDocRef = doc(logsCollection, timeIn!.toLocaleDateString().replaceAll('/', '-'));
     
@@ -394,7 +394,7 @@ export const AuthContextProvider = ({children}: {children: ReactNode}) =>{
         try {
             setLogEmployee([]);
             const existingLogsRef = collection(db, "Logs");
-            const existingLogsQuery = query(existingLogsRef, limit(3));
+            const existingLogsQuery = query(existingLogsRef, limit(25));
             const existingLogsSnap = await getDocs(existingLogsQuery);
     
             if (!existingLogsSnap.empty) {

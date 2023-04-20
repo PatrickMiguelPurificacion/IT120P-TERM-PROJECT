@@ -12,20 +12,20 @@ const EmployeeLog = () => {
     const [employeeLog, setEmployeeLog] = useState<{
         uuid: string,
         fullName: string,
-        timeIn: Date | null,
+        timeIn: Date,
         timeOut: Date | null
     }>({
         uuid: '',
         fullName: '',
-        timeIn: null,
+        timeIn: new Date(),
         timeOut: null
     });
 
     const [currentLogs, setCurrentLogs] = useState([{
         uuid: '',
         fullName: '',
-        timeIn: new Date(0),
-        timeOut: new Date(0)
+        timeIn: new Date(),
+        timeOut:  new Date(0,0,0)
     }]);
     
     const [alertMessage, setAlertMessage] = useState({type: '', message:'', show: false});
@@ -97,8 +97,8 @@ const EmployeeLog = () => {
           setEmployeeLog({
               uuid: currentEmployee ? currentEmployee.uuid : '',
               fullName: currentEmployee!.firstName + " " + currentEmployee!.lastName,
-              timeIn: null,
-              timeOut: null
+              timeIn: new Date(),
+              timeOut: new Date()
           });
   
       }
@@ -128,7 +128,6 @@ const EmployeeLog = () => {
       if(logEmployee){
 
           const endOffset = itemOffset + 5;
-          console.log(`Loading items from ${itemOffset} to ${endOffset}`);
           setCurrentLogs(logEmployee!.slice(itemOffset, endOffset));
           setPageCount(Math.ceil(logEmployee!.length / 5));
 
@@ -214,7 +213,7 @@ const EmployeeLog = () => {
                                   {log.timeIn ? log.timeIn.toLocaleTimeString() : "Not Available"}
                                 </td>
                                 <td>
-                                  {log.timeOut ? log.timeOut.toLocaleTimeString() : "Not Available"}
+                                  {log.timeOut.getTime() > 0 ? log.timeOut.toLocaleTimeString() : "Not Available"}
                                 </td>
                               </tr>
                             )
