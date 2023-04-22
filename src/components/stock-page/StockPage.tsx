@@ -4,6 +4,7 @@ import Employee from '../employee/Employee'
 import logo from '../../assets/stock-page/FabricFinesse.png';
 import { Link, useNavigate } from 'react-router-dom';
 import Alert from '../alerts/Alerts';
+import { InventoryAuth } from '../../context/InventoryContext';
 
 const StockPage = () => {
 
@@ -12,7 +13,48 @@ const StockPage = () => {
     const [formState, setFormState] = useState('None');
     const [isItemValid, setIsItemValid] = useState(false);
     const navigate = useNavigate();
+    const {item, allItems, addItems, updateItems, deleteItem, getItem,  getItems}= InventoryAuth ();
 
+    const [ItemsAdd, setaddItem] = useState<{
+        id: number;
+        name: string;
+        brand: string[];
+        code: string[];
+        quantity: number;
+        unitPrice: number;
+        totalPrice: number;
+        purpose: string[];
+      }>({
+        id: 0,
+        name: '',
+        brand: [],
+        code: [],
+        quantity: 0,
+        unitPrice: 0,
+        totalPrice: 0,
+        purpose: [],
+      });
+      
+      //declaring for items update
+      const [ItemsUpdate, setUpdateItem] = useState<{
+        id: number;
+        name: string;
+        brand: string[];
+        code: string[];
+        quantity: number;
+        unitPrice: number;
+        totalPrice: number;
+        purpose: string[];
+      }>({
+        id: 0,
+        name: '',
+        brand: [],
+        code: [],
+        quantity: 0,
+        unitPrice: 0,
+        totalPrice: 0,
+        purpose: [],
+      });
     const goToInvTable = () =>{
 
         navigate("/dashboard/stock-display");
@@ -23,9 +65,59 @@ const StockPage = () => {
 
         e.preventDefault();
         setAlertMessage({type: '', message: '', show: false});
+      
+        try{
+            const {
+      
+                name,
+                brand,
+                code,
+                quantity,
+                unitPrice,
+                purpose,
+              } = ItemsAdd;
+      
+              await addItems( name, brand,code, quantity,unitPrice,purpose ).then(()=>{
+      
+                setRefreshCounter(prevCounter => prevCounter + 1);
+                return setAlertMessage({type: 'success', message: 'Item Added Successfully.', show: true});
+      
+            }).catch((error)=>{
+      
+                return setAlertMessage({type: 'error', message: error.message, show: true});
+      
+            });
+        }catch(e: unknown){
+      
+            if(e instanceof Error){
+                return setAlertMessage({type: 'error', message: e.message, show: true});
+            }
+      
+        }
+    }
+           
+          // not yet done  
+    const itemUpdate: FormEventHandler<HTMLFormElement> = async (e) => {
+
+        e.preventDefault();
+        setAlertMessage({type: '', message: '', show: false});
 
         try{
-
+            const {
+                id,
+                name,
+                brand,
+                code,
+                quantity,
+                unitPrice,
+                totalPrice,
+                purpose,
+              } = ItemsUpdate;
+              await updateItems(id,name,brand,code,quantity,unitPrice,totalPrice,purpose)
+              .then(()=>{
+                  setRefreshCounter(prevCounter => prevCounter + 1);
+                  return setAlertMessage({type: 'success', message: 'Order Updated Successfully.', show: true});
+              })
         }catch(e: unknown){
             
             if(e instanceof Error){
@@ -35,8 +127,9 @@ const StockPage = () => {
         }
 
     }
+      //end of stocks update
 
-    const updateItem: FormEventHandler<HTMLFormElement> = async (e) => {
+    const itemDelete: FormEventHandler<HTMLFormElement> = async (e) => {
 
         e.preventDefault();
         setAlertMessage({type: '', message: '', show: false});
@@ -52,24 +145,33 @@ const StockPage = () => {
         }
 
     }
+    useEffect(() =>{
 
-    const deleteItem: FormEventHandler<HTMLFormElement> = async (e) => {
-
-        e.preventDefault();
-        setAlertMessage({type: '', message: '', show: false});
-
-        try{
-
-        }catch(e: unknown){
-            
-            if(e instanceof Error){
-                return setAlertMessage({type: 'error', message: e.message, show: true});
-            }
-
+        if (ItemsAdd.name && ItemsAdd.brand && ItemsAdd.code)
+        {
+            setIsItemValid(true);
         }
+        
+        
+      },[ItemsAdd])
 
-    }
+    useEffect(()=>{
 
+      if(alertMessage.show){
+          setTimeout(()=>{setAlertMessage({type: '', message: '', show: false})}, 5000)
+      }
+
+    },[alertMessage.message]);
+    
+    useEffect(() =>{
+
+        if (ItemsUpdate.name && ItemsUpdate.brand && ItemsUpdate.code)
+        {
+            setIsItemValid(true);
+        }
+        
+        
+      },[ItemsUpdate])
     useEffect(()=>{
 
       if(alertMessage.show){
@@ -123,29 +225,30 @@ const StockPage = () => {
                                           <div className="col-md-6">
                                               <div className="form-outline">
                                                   <label className="form-label">ITEM NAME</label>
-                                                  <p><input type="text" id="ItemName" placeholder="Item Name" /></p>
+                                                  <p><input type="text" id="ItemName" placeholder="Item Name" onChange={(e) => setaddItem({ ...ItemsAdd, name: e.target.value })}/></p>
                                               </div>
                                               <div className="form-outline">
                                                   <label className="form-label">ITEM BRAND</label>
-                                                  <p><input type="text" id="ItemBrand" placeholder="Item Brand" /></p>
+                                                  <p><input type="text" id="ItemBrand" placeholder="Item Brand" onChange={(e) => setaddItem({ ...ItemsAdd, brand: [e.target.value] })}/> </p>
                                               </div>
                                               <div className="form-outline">
                                                   <label className="form-label">ITEM CODE</label>
-                                                  <p><input type="text" id="ItemCode" placeholder="Item Code" /></p>
+                                                  <p><input type="text" id="ItemCode" placeholder="Item Code" onChange={(e) => setaddItem({ ...ItemsAdd, code: [e.target.value] })}/> /</p>
                                               </div>
                                           </div>
                                           <div className="col-md-6">
                                               <div className="form-outline">
                                                   <label className="form-label">QUANTITY</label>
-                                                  <p><input type="text" inputMode='numeric' id="Quantity" placeholder="Quantity" /></p>
+                                                  <p><input type="text" inputMode='numeric' id="Quantity" placeholder="Quantity" onChange={(e) => setaddItem({ ...ItemsAdd, quantity: parseInt(e.target.value) })}/> /</p>
+
                                               </div>
                                               <div className="form-outline">
                                                   <label className="form-label">UNIT PRICE</label>
-                                                  <p><input type="text" inputMode='numeric' id="ItemUnitPrice" placeholder="Unit Price" /></p>
+                                                  <p><input type="text" inputMode='numeric' id="ItemUnitPrice" placeholder="Unit Price" onChange={(e) => setaddItem({ ...ItemsAdd, unitPrice: parseInt(e.target.value) })}/> /</p>
                                               </div>
                                               <div className="form-outline">
                                                   <label className="form-label">PURPOSE</label>
-                                                  <p><input type="text" id="Purpose" placeholder="Item Purpose" /></p>
+                                                  <p><input type="text" id="Purpose" placeholder="Item Purpose" onChange={(e) => setaddItem({ ...ItemsAdd, purpose: [e.target.value] })}/> </p>
                                               </div>
                                           </div>
                                         </div>
@@ -172,13 +275,13 @@ const StockPage = () => {
                               </div>
                               <div className="row text-center">
                                   <div className="col-md-6">
-                                      <form className="form" onSubmit={updateItem}>
+                                      <form className="form" onSubmit={itemUpdate}>
                                           <div className="row">
                                             <div className="col-md-6">
                                                 <div className="form-outline">
                                                     <label className="form-label">ITEM ID</label>
-                                                    <p><input type="text" id="ItemId" placeholder="Item ID" /></p>
-                                                </div>
+                                                    <p><input type="text" id="ItemId" placeholder="Item ID" onChange={(e) => setUpdateItem({ ...ItemsUpdate, id: parseInt(e.target.value) })}/></p>
+                                                    </div>
                                                 <div className="form-outline">
                                                     <label className="form-label">ITEM NAME</label>
                                                     <p><input type="text" id="ItemName" placeholder="Item Name" /></p>
@@ -234,7 +337,7 @@ const StockPage = () => {
                             </div>
                             <div className="row text-center">
                                 <div className="col-md-6">
-                                    <form className="form" onSubmit={deleteItem}>
+                                    <form className="form" onSubmit={itemDelete}>
                                         <div className="row">
                                           <div className="col-md-6">
                                               <div className="form-outline">
@@ -278,6 +381,6 @@ const StockPage = () => {
         </div>
       </>
     )
-}
 
+}
 export default StockPage
