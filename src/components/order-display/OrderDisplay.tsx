@@ -21,7 +21,7 @@ const OrderDisplay = () => {
         customerAddress: "",
         dateCreated: new Date(0),
         dateCompleted: new Date(0),
-        employeeID: 0,
+        employeeID: "",
         instructions: {
           bleaching: "",
           dryCleaning: "",
@@ -43,7 +43,7 @@ const OrderDisplay = () => {
           sleepWear: [""],
           swimWear: [""],
           undergarments: [""],
-          notes: [""],
+          Notes: [""],
         },
         status: "",
     }]);
