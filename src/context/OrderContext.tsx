@@ -11,7 +11,7 @@ interface Order{
   customerAddress: string;
   dateCreated: Date;
   dateCompleted: Date;
-  employeeID: number;
+  employeeID: string;
   instructions: {
     bleaching: string;
     dryCleaning: string;
@@ -33,7 +33,7 @@ interface Order{
     sleepWear: string[];
     swimWear: string[];
     undergarments: string[];
-    notes: string[];
+    Notes: string[];
   };
   status: string;
 }
@@ -43,6 +43,7 @@ interface AddOrder{
   customerNumber: string;
   customerAddress: string;
   dateCreated: Date;
+  employeeId: string;
   instructions: {
     bleaching: string;
     dryCleaning: string;
@@ -64,7 +65,7 @@ interface AddOrder{
     sleepWear: string[];
     swimWear: string[];
     undergarments: string[];
-    notes: string[];
+    Notes: string[];
   };
 }
 
@@ -75,7 +76,7 @@ interface UpdateOrder{
   customerAddress: string;
   dateCreated: Date;
   dateCompleted: Date;
-  employeeID: number;
+  employeeID: string|null;
   instructions: {
     bleaching: string;
     dryCleaning: string;
@@ -97,7 +98,7 @@ interface UpdateOrder{
     sleepWear: string[];
     swimWear: string[];
     undergarments: string[];
-    notes: string[];
+    Notes: string[];
   };
   status: string;
 }
@@ -105,7 +106,7 @@ interface UpdateOrder{
 interface DeleteOrder{
   id: number;  
   customerName: string;
-  employeeID: number;
+  employeeID: string;
 }
   
 export const OrderContext = createContext<{
@@ -119,6 +120,7 @@ export const OrderContext = createContext<{
       customerNumber: string,
       customerAddress: string,
       dateCreated: Date,
+      employeeId: string,
       instructions: {
         bleaching: string;
         dryCleaning: string;
@@ -140,7 +142,7 @@ export const OrderContext = createContext<{
         sleepWear: string[],
         swimWear: string[],
         undergarments: string[],
-        notes: string[],
+        Notes: string[],
       },
     ) => Promise<void>;
     updateOrders:(
@@ -150,7 +152,7 @@ export const OrderContext = createContext<{
       customerAddress: string,
       dateCreated: Date,
       dateCompleted: Date,
-      employeeID: number,
+      employeeID: string|null,
       instructions: {
         bleaching: string,
         dryCleaning: string,
@@ -172,19 +174,19 @@ export const OrderContext = createContext<{
         sleepWear: string[],
         swimWear: string[],
         undergarments: string[],
-        notes: string[],
+        Notes: string[],
       },
       status: string,
     ) => Promise<void>;
     deleteOrders:(
       id: number,
       customerName: string,
-      employeeID: number,
+      employeeID: string,
     ) => Promise<void>;
     getOrder:(
       id: number,
       customerName: string,
-      employeeID: number,
+      employeeID: string|null,
     ) => Promise<void>;
     getOrders:() => Promise<void>;
   }>({
@@ -223,6 +225,7 @@ export const OrderContextProvider = ({children}: {children: ReactNode}) =>{
         customerNumber: string,
         customerAddress: string,
         dateCreated: Date,
+        employeeId: string,
         instructions: {
           bleaching: string;
           dryCleaning: string;
@@ -244,15 +247,51 @@ export const OrderContextProvider = ({children}: {children: ReactNode}) =>{
           sleepWear: string[],
           swimWear: string[],
           undergarments: string[],
-          notes: string[],
+          Notes: string[],
         },
     ) => {
 
         try {
+          console.log(customerName);
+          console.log(instructions.bleaching);
+          console.log(laundryInfo.accesories);
+          const order = {
+            Customer_Name: customerName, 
+            Contact_Number: customerNumber,
+            Address: customerAddress,
+            Date_Created: dateCreated,
+            Employee_ID: employeeId,
+            Instructions: {
+                 Bleaching: instructions.bleaching,
+                 Dry_Cleaning: instructions.bleaching,
+                 Drying: instructions.drying,
+                 Ironing: instructions.ironing,
+                 Special_Care: instructions.specialCare,
+                 Stain_Removal: instructions.stainRemoval,
+                 Storage: instructions.storage,
+                 Washing: instructions.washing,
+                 _Notes: instructions.notes
+            },
+            LaundryInfo: {
+                Accessories: laundryInfo.accesories,
+                Activewear: laundryInfo.activeWear,
+                Tops: laundryInfo.tops,
+                Bottoms: laundryInfo.bottoms,
+                Dresses: laundryInfo.dresses,
+                Formalwear: laundryInfo.formalWear,
+                Sleepwear: laundryInfo.sleepWear,
+                Swimwear: laundryInfo.swimWear,
+                Undergarments: laundryInfo.undergarments,
+                _Notes: laundryInfo.Notes
+            },
+            Status: 'Ongoing'
 
-
-
-        } catch (error) {
+           }
+           const ordersCollection = collection(db, 'Orders');
+           const ordersDocRef = doc(ordersCollection);
+           await setDoc(ordersDocRef,{...order,Order_ID:ordersDocRef.id});
+          }
+      catch (error) {
 
             console.error(error);
             throw error;
@@ -267,7 +306,7 @@ export const OrderContextProvider = ({children}: {children: ReactNode}) =>{
         customerAddress: string,
         dateCreated: Date,
         dateCompleted: Date,
-        employeeID: number,
+        employeeID: string|null,
         instructions: {
           bleaching: string,
           dryCleaning: string,
@@ -289,7 +328,7 @@ export const OrderContextProvider = ({children}: {children: ReactNode}) =>{
           sleepWear: string[],
           swimWear: string[],
           undergarments: string[],
-          notes: string[],
+          Notes: string[],
         },
         status: string,
     ) => {
@@ -309,7 +348,7 @@ export const OrderContextProvider = ({children}: {children: ReactNode}) =>{
     const deleteOrders = async (
         id?: number | null,
         customerName?: string | null,
-        employeeID?: number | null,
+        employeeID?: string ,
     ) => {
 
         try {
@@ -327,7 +366,7 @@ export const OrderContextProvider = ({children}: {children: ReactNode}) =>{
     const getOrder = async (
         id?: number | null,
         customerName?: string | null,
-        employeeID?: number | null,
+        employeeID?: string | null ,
     ) => {
 
         try {
