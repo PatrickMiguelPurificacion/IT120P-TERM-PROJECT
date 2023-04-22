@@ -215,6 +215,8 @@ const Empview = () => {
             profilePicture: null
         });
 
+        setNewPassword('');
+
     }
 
   },[currentEmployee, updateEmployee])
