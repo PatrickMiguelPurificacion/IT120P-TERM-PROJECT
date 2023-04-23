@@ -11,6 +11,7 @@ const OrderDisplay = () => {
   
     const [alertMessage, setAlertMessage] = useState({type: '', message:'', show: false});
     const [refreshCounter, setRefreshCounter] = useState(0);
+    const [isLoaded, setIsLoaded] = useState(false);
     const [pageCount, setPageCount] = useState(0);
     const [itemOffset, setItemOffset] = useState(0);
     const {getOrders, allOrders} = OrderAuth();
@@ -31,11 +32,19 @@ const OrderDisplay = () => {
 
     useEffect(()=>{
 
-        if(currentEmployee){
+        if(isLoaded){
             getOrders();
         }
 
-    },[currentEmployee]);
+    },[isLoaded]);
+
+    useEffect(()=>{
+
+        setCurrentOrders([]);
+        setRefreshCounter(prevCounter => prevCounter + 1);
+        setIsLoaded(true);
+
+    },[]);
     
     useEffect(()=>{
 
@@ -118,7 +127,7 @@ const OrderDisplay = () => {
                     :
                         <>
                             <div className="text-light text-center">
-                              <h1>There are currently no orders at the moment.</h1>
+                              <h1>Loading Orders...</h1>
                             </div>
                         </>
                     }

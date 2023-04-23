@@ -11,6 +11,7 @@ const StockDisplay = () => {
 
     const [alertMessage, setAlertMessage] = useState({type: '', message:'', show: false});
     const [refreshCounter, setRefreshCounter] = useState(0);
+    const [isLoaded, setIsLoaded] = useState(false);
     const [pageCount, setPageCount] = useState(0);
     const [itemOffset, setItemOffset] = useState(0);
     const {getItems, allItems} = InventoryAuth();
@@ -35,11 +36,19 @@ const StockDisplay = () => {
 
     useEffect(()=>{
 
-        if(currentEmployee){
+        if(isLoaded){
             getItems();
         }
 
-    },[currentEmployee]);
+    },[isLoaded]);
+
+    useEffect(()=>{
+
+        setCurrentItems([]);
+        setRefreshCounter(prevCounter => prevCounter + 1);
+        setIsLoaded(true);
+
+    },[]);
 
     useEffect(()=>{
 
@@ -129,7 +138,7 @@ const StockDisplay = () => {
                     :
                         <>
                             <div className="text-light text-center">
-                              <h1>There are currently no items in stock.</h1>
+                              <h1>Loading Items...</h1>
                             </div>
                         </>
                     }
