@@ -1,5 +1,5 @@
 import { EmailAuthProvider, User as FirebaseUser, createUserWithEmailAndPassword, getAuth, onAuthStateChanged, reauthenticateWithCredential, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { FieldValue, arrayUnion, collection, doc, documentId, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore';
+import { FieldValue, arrayUnion, collection, doc, documentId, getDocs, query, setDoc, updateDoc, where, limit } from 'firebase/firestore';
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from '../scripts/firebase-init';
 import { StorageAuth } from './StorageContext';
@@ -41,10 +41,21 @@ interface DeleteItem{
     brand: string[];
     code: string[];
 }
+interface StockDisplay{
+  id: string;
+  name: string;
+  brand: string[];
+  code: string[];
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  purpose: string[];
+}
+
   
 export const InventoryContext = createContext<{
     item: Item | null;
-    allItems: Item[] | null;
+    allItems: StockDisplay[] | null;
     addItem: AddItem | null;
     updateItem: UpdateItem | null;
     deleteItem: DeleteItem | null;
@@ -105,7 +116,7 @@ export const InventoryContext = createContext<{
 export const InventoryContextProvider = ({children}: {children: ReactNode}) =>{
   
     const [item, setItem] = useState<Item | null>(null);
-    const [allItems, setAllItems] = useState<Item[] | null>(null);
+    const [allItems, setAllItems] = useState<StockDisplay[] | null>(null);
     const [addItem, setAddItem] = useState<AddItem | null>(null);
     const [updateItem, setUpdateItem] = useState<UpdateItem | null>(null);
     const [deleteItem, setDeleteItem] = useState<DeleteItem | null>(null);
@@ -193,18 +204,48 @@ export const InventoryContextProvider = ({children}: {children: ReactNode}) =>{
     }
 
     const getItems = async () => {
+      try {
+        setAllItems([]);
+        const existingInventoryCollection = collection(db, 'Inventory');
+        const existingInventoryQuery = query(existingInventoryCollection, limit(25));
+        const existingInventorySnap = await getDocs(existingInventoryQuery);
+        console.log(!existingInventorySnap.empty);
+        if (!existingInventorySnap.empty) {
 
-        try {
+          existingInventorySnap.forEach((doc) => {
+           
+              const id = doc.id;
+              const Name = doc.data().Name;
+              const Brand = doc.data().Brand;
+              const Code = doc.data().Code;
+              const Quantity = doc.data().Quantity;
+              const unitPrice = doc.data().Unit_Price;
+              const totalPrice = doc.data().TotalPrice;
+              const purpose = doc.data().Purpose;
+                setAllItems((prevStockDisplay) => [
+                  ...prevStockDisplay as StockDisplay[],
+                  {
+                    id: id,
+                    name: Name,
+                    brand:Brand,
+                    code: Code,
+                    quantity:Quantity,
+                    unitPrice:unitPrice,
+                    totalPrice:totalPrice,
+                    purpose:purpose,
 
+                  },
+                ]);
+              
+            
 
-
-        } catch (error) {
-
-            console.error(error);
-            throw error;
-
+          });
         }
-    }
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    };
   
     useEffect(() =>{
   

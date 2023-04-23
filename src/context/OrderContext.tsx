@@ -394,7 +394,6 @@ export const OrderContextProvider = ({children}: {children: ReactNode}) =>{
         const existingOrdersCollection = collection(db, 'Orders');
         const existingOrdersQuery = query(existingOrdersCollection, limit(25));
         const existingOrdersSnap = await getDocs(existingOrdersQuery);
-        console.log(!existingOrdersSnap.empty);
         if (!existingOrdersSnap.empty) {
 
           existingOrdersSnap.forEach((doc) => {
@@ -402,14 +401,14 @@ export const OrderContextProvider = ({children}: {children: ReactNode}) =>{
               const id = doc.id;
               const customerName = doc.data().Customer_Name;
               const employeeId = doc.data().Employee_ID;
-              const orderStatus = doc.data().Status;
+              const status = doc.data().Status;
                 setAllOrders((prevOrderDisplay) => [
                   ...prevOrderDisplay as OrderDisplay[],
                   {
                     id: id,
                     customerName: customerName,
                     employeeId:employeeId,
-                    status: orderStatus,              
+                    status: status,              
                   },
                 ]);
               
