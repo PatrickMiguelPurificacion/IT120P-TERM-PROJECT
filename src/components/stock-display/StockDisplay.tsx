@@ -14,7 +14,7 @@ const StockDisplay = () => {
     const [itemOffset, setItemOffset] = useState(0);
     const {getItems, allItems} = InventoryAuth();
     const [currentItems, setCurrentItems] = useState([{
-          id: -1,
+          id: "",
           name: '',
           brand: [''],
           code: [''],
