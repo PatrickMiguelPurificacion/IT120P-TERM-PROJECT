@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import OrderDisplayCSS from './OrderDisplay.module.css'
 import Employee from '../employee/Employee'
 import logo from '../../assets/order-display/FabricFinesse.png'
-import { InventoryAuth } from '../../context/InventoryContext'
 import ReactPaginate from 'react-paginate'
 import Alert from '../alerts/Alerts'
 import { OrderAuth } from '../../context/OrderContext'
@@ -21,26 +20,23 @@ const OrderDisplay = () => {
         customerName: "",
         employeeId: "",
         status:"",
-       
-        
     }]);
 
     const handlePageClick = (event: { selected: number; }) => {
       
       const newOffset = event.selected * 5 % allOrders!.length;
-      console.log(`User requested page number ${event.selected}, which is offset ${newOffset}`);
       setItemOffset(newOffset);
 
     }
 
     useEffect(()=>{
 
-      getOrders();
+        if(currentEmployee){
+            getOrders();
+        }
 
-    },[allOrders]);
-
+    },[currentEmployee]);
     
-
     useEffect(()=>{
 
       if(alertMessage.show){
@@ -54,13 +50,12 @@ const OrderDisplay = () => {
         if(allOrders){
 
             const endOffset = itemOffset + 5;
-            console.log(`Loading items from ${itemOffset} to ${endOffset}`);
             setCurrentOrders(allOrders!.slice(itemOffset, endOffset));
             setPageCount(Math.ceil(allOrders!.length / 5));
 
         }
 
-    }, [itemOffset, 5]);
+    }, [allOrders, itemOffset, 5]);
 
     return (
       <>

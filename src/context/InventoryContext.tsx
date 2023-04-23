@@ -52,7 +52,6 @@ interface StockDisplay{
   purpose: string[];
 }
 
-  
 export const InventoryContext = createContext<{
     item: Item | null;
     allItems: StockDisplay[] | null;
@@ -209,7 +208,7 @@ export const InventoryContextProvider = ({children}: {children: ReactNode}) =>{
         const existingInventoryCollection = collection(db, 'Inventory');
         const existingInventoryQuery = query(existingInventoryCollection, limit(25));
         const existingInventorySnap = await getDocs(existingInventoryQuery);
-        console.log(!existingInventorySnap.empty);
+
         if (!existingInventorySnap.empty) {
 
           existingInventorySnap.forEach((doc) => {
@@ -220,25 +219,22 @@ export const InventoryContextProvider = ({children}: {children: ReactNode}) =>{
               const Code = doc.data().Code;
               const Quantity = doc.data().Quantity;
               const unitPrice = doc.data().Unit_Price;
-              const totalPrice = doc.data().TotalPrice;
+              const totalPrice = doc.data().Total_Price;
               const purpose = doc.data().Purpose;
-                setAllItems((prevStockDisplay) => [
-                  ...prevStockDisplay as StockDisplay[],
-                  {
-                    id: id,
-                    name: Name,
-                    brand:Brand,
-                    code: Code,
-                    quantity:Quantity,
-                    unitPrice:unitPrice,
-                    totalPrice:totalPrice,
-                    purpose:purpose,
+              setAllItems((prevStockDisplay) => [
+                ...prevStockDisplay as StockDisplay[],
+                {
+                  id: id,
+                  name: Name,
+                  brand:Brand,
+                  code: Code,
+                  quantity:Quantity,
+                  unitPrice:unitPrice,
+                  totalPrice:totalPrice,
+                  purpose:purpose,
 
-                  },
-                ]);
-              
-            
-
+                },
+              ]);
           });
         }
       } catch (error) {

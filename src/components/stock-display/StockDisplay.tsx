@@ -5,6 +5,7 @@ import logo from '../../assets/stock-display/FabricFinesse.png';
 import Alert from '../alerts/Alerts';
 import { InventoryAuth } from '../../context/InventoryContext';
 import ReactPaginate from 'react-paginate';
+import { UserAuth } from '../../context/UserContext';
 
 const StockDisplay = () => {
 
@@ -13,6 +14,7 @@ const StockDisplay = () => {
     const [pageCount, setPageCount] = useState(0);
     const [itemOffset, setItemOffset] = useState(0);
     const {getItems, allItems} = InventoryAuth();
+    const {currentEmployee} = UserAuth();
     const [currentItems, setCurrentItems] = useState([{
           id: "",
           name: '',
@@ -27,16 +29,17 @@ const StockDisplay = () => {
     const handlePageClick = (event: { selected: number; }) => {
       
       const newOffset = event.selected * 5 % allItems!.length;
-      console.log(`User requested page number ${event.selected}, which is offset ${newOffset}`);
       setItemOffset(newOffset);
 
     }
 
     useEffect(()=>{
 
-      getItems();
+        if(currentEmployee){
+            getItems();
+        }
 
-    },[allItems]);
+    },[currentEmployee]);
 
     useEffect(()=>{
 
@@ -51,12 +54,11 @@ const StockDisplay = () => {
         if(allItems){
 
             const endOffset = itemOffset + 5;
-            console.log(`Loading items from ${itemOffset} to ${endOffset}`);
             setCurrentItems(allItems!.slice(itemOffset, endOffset));
             setPageCount(Math.ceil(allItems!.length / 5));
 
         }
-    }, [itemOffset, 5]);
+    }, [allItems, itemOffset, 5]);
 
     return (
       <>
