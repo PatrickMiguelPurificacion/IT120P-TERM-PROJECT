@@ -127,18 +127,37 @@ export const InventoryContextProvider = ({children}: {children: ReactNode}) =>{
       quantity: number,
       unitPrice: number,
       purpose: string[],
+     
     ) => {
 
         try {
 
-
-
+            console.log(name);
+            console.log(brand); 
+            console.log(quantity); 
+            console.log(unitPrice); 
+            console.log(purpose); 
+            const item = {
+                Brand: brand,
+                Code:  code,
+                Name:  name,
+                Purpose: purpose,
+                Quantity: quantity,                
+                Unit_Price:  unitPrice,
+                Total_Price: (unitPrice*quantity),
+                
+            }
+            const itemsCollection = collection(db, 'Inventory');
+            const itemsDocRef = doc(itemsCollection);
+            await setDoc(itemsDocRef,{...item,Item_ID:itemsDocRef.id});
+           
         } catch (error) {
 
             console.error(error);
             throw error;
 
         }
+    
     }
 
     const updateItems = async (
@@ -153,15 +172,24 @@ export const InventoryContextProvider = ({children}: {children: ReactNode}) =>{
     ) => {
 
         try {
-
-
-
+          const item = {
+            Brand: brand,
+            Code:  code,
+            Name:  name,
+            Purpose: purpose,
+            Quantity: quantity,                
+            Unit_Price:  unitPrice,
+            Total_Price: (unitPrice*quantity),
+          }
+          const auth = getAuth();
+       
         } catch (error) {
 
             console.error(error);
             throw error;
 
         }
+           const auth = getAuth();
     }
 
     const deleteItems = async (
