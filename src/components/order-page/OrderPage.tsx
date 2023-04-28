@@ -4,13 +4,140 @@ import Employee from '../employee/Employee'
 import logo from '../../assets/order-page/FabricFinesse.png'
 import { useNavigate } from 'react-router-dom'
 import Alert from '../alerts/Alerts'
-
+import { OrderAuth } from '../../context/OrderContext'
+import FormValidator from '../../scripts/formValidator';
+import { UserAuth } from '../../context/UserContext'
 const OrderPage = () => {
-
+    const {order, allOrders, addOrders, updateOrders, deleteOrders, getOrder, getOrders}=OrderAuth();
+    const {currentEmployee} = UserAuth();
     const [alertMessage, setAlertMessage] = useState({type: '', message:'', show: false});
     const [refreshCounter, setRefreshCounter] = useState(0);
     const [formState, setFormState] = useState('None');
     const [isOrderValid, setIsOrderValid] = useState(false);
+    const formValidator = new FormValidator();
+    const [updateOrder, setupdateOrder]= useState<{
+        id: number;  
+        customerName: string;
+        customerNumber: string;
+        customerAddress: string;
+        dateCreated: Date|null;
+        dateCompleted: Date|null;
+        employeeID: string|null;
+        instructions: {
+          bleaching: string;
+          dryCleaning: string;
+          drying: string;
+          ironing: string;
+          specialCare: string;
+          stainRemoval: string;
+          storage: string;
+          washing: string;
+          notes: string[];
+        };
+        laundryInfo: {
+          accesories: string[];
+          activeWear: string[];
+          tops: string[];
+          bottoms: string[];
+          dresses: string[];
+          formalWear: string[];
+          sleepWear: string[];
+          swimWear: string[];
+          undergarments: string[];
+          Notes: string[];
+        };
+        status: string;
+      }>({
+        id: -1,  
+        customerName: '',
+        customerNumber: '',
+        customerAddress: '',
+        dateCreated: null,
+        dateCompleted: null,
+        employeeID: null,
+        instructions: {
+          bleaching: '',
+          dryCleaning: '',
+          drying: '',
+          ironing: '',
+          specialCare: '',
+          stainRemoval: '',
+          storage: '',
+          washing: '',
+          notes: [''],
+        },
+        laundryInfo: {
+          accesories: [''],
+          activeWear: [''],
+          tops: [''],
+          bottoms: [''],
+          dresses: [''],
+          formalWear: [''],
+          sleepWear: [''],
+          swimWear: [''],
+          undergarments: [''],
+          Notes: [''],
+        },
+        status: ''
+
+       })
+
+    const [addOrder, setaddOrder] = useState<{
+        customerName: string,
+        customerNumber: string,
+        customerAddress: string,
+        dateCreated: Date,
+        instructions:{
+          bleaching: string;
+          dryCleaning: string;
+          drying: string;
+          ironing: string;
+          specialCare: string;
+          stainRemoval: string;
+          storage: string;
+          washing: string;
+          notes: string[];
+        },
+        laundryInfo: {
+          accesories: string[],
+          activeWear: string[],
+          tops: string[],
+          bottoms: string[],
+          dresses: string[],
+          formalWear: string[],
+          sleepWear: string[],
+          swimWear: string[],
+          undergarments: string[],
+          Notes: string[],
+      }}>({
+        customerName: '',
+        customerNumber:'' ,
+        customerAddress:'' ,
+        dateCreated: new Date(),
+        instructions: {
+          bleaching: 'none',
+          dryCleaning: 'none',
+          drying: 'none',
+          ironing: 'none',
+          specialCare: 'none',
+          stainRemoval: 'none',
+          storage: 'none',
+          washing: 'none',
+          notes: ['none'],
+        },
+        laundryInfo: {
+          accesories: ['none'],
+          activeWear: ['none'],
+          tops: ['none'],
+          bottoms: ['none'],
+          dresses: ['none'],
+          formalWear: ['none'],
+          sleepWear: ['none'],
+          swimWear: ['none'],
+          undergarments: ['none'],
+          Notes: ['none'],
+      }})
+   
     const navigate = useNavigate();
 
     const goToOrderTable = () =>{
@@ -19,7 +146,129 @@ const OrderPage = () => {
 
     }
 
-    const addOrder: FormEventHandler<HTMLFormElement> = async (e) => {
+    const orderAdd: FormEventHandler<HTMLFormElement> = async (e) => {
+
+        e.preventDefault();
+        setAlertMessage({type: '', message: '', show: false});
+
+        try{
+            const{
+            customerName ,
+            customerNumber,
+            customerAddress ,
+            dateCreated,
+            instructions: {
+                 bleaching,
+                 dryCleaning,
+                 drying,
+                 ironing,
+                 specialCare,
+                stainRemoval,
+                storage,
+                 washing,
+                notes
+            },
+            laundryInfo: {
+                accesories,
+                activeWear,
+                tops,
+                bottoms,
+                dresses,
+                formalWear,
+                sleepWear,
+                swimWear,
+                undergarments,
+                Notes
+            }
+         } = addOrder;
+
+         await addOrders(customerName ,customerNumber,customerAddress ,new Date(),currentEmployee!.uuid,addOrder.instructions,addOrder.laundryInfo).then(()=>{
+
+            setRefreshCounter(prevCounter => prevCounter + 1);
+            return setAlertMessage({type: 'success', message: 'Order Added Successfully.', show: true});
+
+        }).catch((error: { message: any })=>{
+
+            return setAlertMessage({type: 'error', message: error.message, show: true});
+
+        });
+          
+         
+
+        }
+        catch(e: unknown){
+            
+            if(e instanceof Error){
+                return setAlertMessage({type: 'error', message: e.message, show: true});
+            }
+
+        }
+
+    }
+
+    const orderUpdate: FormEventHandler<HTMLFormElement> = async (e) => {
+
+        e.preventDefault();
+        setAlertMessage({type: '', message: '', show: false});
+
+        /*try{
+            const{
+            id,  
+            customerName,
+            customerNumber,
+            customerAddress,
+            dateCreated,
+            dateCompleted,
+            employeeID,
+            instructions: {
+                bleaching,
+                dryCleaning,
+                drying,
+                ironing,
+                specialCare,
+                stainRemoval,
+                storage,
+                washing,
+                notes ,
+             },
+            laundryInfo: {
+                accesories ,
+                activeWear ,
+                tops ,
+                bottoms ,
+                dresses ,
+                formalWear ,
+                sleepWear ,
+                swimWear ,
+                undergarments ,
+                Notes ,
+            },
+            status} = updateOrder;
+
+            await updateOrders(id,customerName,customerNumber,customerAddress,dateCreated as Date,dateCompleted as Date,employeeID,updateOrder.instructions,updateOrder.laundryInfo,status).then(() =>{
+
+                setRefreshCounter(prevCounter => prevCounter + 1);
+                getOrder(id,customerName,employeeID);
+                return setAlertMessage({type: 'success', message: 'User Updated Successfully.', show: true});
+  
+            }).catch((error)=>{
+                
+                return setAlertMessage({type: 'error', message: error.message, show: true});
+  
+            });
+
+
+        }catch(e: unknown){
+            
+            if(e instanceof Error){
+                return setAlertMessage({type: 'error', message: e.message, show: true});
+            }
+
+        } */
+
+    }
+
+    const orderDelete: FormEventHandler<HTMLFormElement> = async (e) => {
 
         e.preventDefault();
         setAlertMessage({type: '', message: '', show: false});
@@ -36,12 +285,22 @@ const OrderPage = () => {
 
     }
 
-    const updateOrder: FormEventHandler<HTMLFormElement> = async (e) => {
+    const searchOrder: FormEventHandler<HTMLFormElement> = async (e) => {
 
         e.preventDefault();
         setAlertMessage({type: '', message: '', show: false});
 
         try{
+            getOrder(order!.id, order!.customerName,order!.employeeID).then(()=>{
+
+                setRefreshCounter(prevCounter => prevCounter + 1);
+                return setAlertMessage({type: 'success', message: 'Order Found Successfully.', show: true});
+    
+            }).catch((error: { message: any })=>{
+    
+                return setAlertMessage({type: 'error', message: error.message, show: true});
+    
+            });
 
         }catch(e: unknown){
             
@@ -53,25 +312,19 @@ const OrderPage = () => {
 
     }
 
-    const deleteOrder: FormEventHandler<HTMLFormElement> = async (e) => {
 
-        e.preventDefault();
-        setAlertMessage({type: '', message: '', show: false});
 
-        try{
+    useEffect(() =>{
 
-        }catch(e: unknown){
-            
-            if(e instanceof Error){
-                return setAlertMessage({type: 'error', message: e.message, show: true});
-            }
-
+        if (addOrder.customerName && addOrder.customerAddress && addOrder.customerNumber && addOrder.instructions.bleaching && addOrder.instructions.dryCleaning && addOrder.instructions.drying && addOrder.instructions.ironing && addOrder.instructions.specialCare && addOrder.instructions.stainRemoval && addOrder.instructions.storage && addOrder.instructions.washing && addOrder.instructions.notes  && addOrder.laundryInfo.accesories && addOrder.laundryInfo.activeWear && addOrder.laundryInfo.tops && addOrder.laundryInfo.bottoms && addOrder.laundryInfo.dresses && addOrder.laundryInfo.formalWear && addOrder.laundryInfo.sleepWear && addOrder.laundryInfo.swimWear && addOrder.laundryInfo.undergarments && addOrder.laundryInfo.Notes)
+        {
+            setIsOrderValid(true);
         }
-
-    }
-
+        
+        
+      },[addOrder])
     useEffect(()=>{
-
+        
       if(alertMessage.show){
           setTimeout(()=>{setAlertMessage({type: '', message: '', show: false})}, 5000)
       }
@@ -118,49 +371,49 @@ const OrderPage = () => {
                               </div>
                               <div className="row text-center">
                                   <div className="col-md-6">
-                                      <form className="form" onSubmit={addOrder}>
+                                      <form className="form" onSubmit={orderAdd}>
                                           <div className="row">
                                               <div className="col-md-4">
                                                   <div className="form-outline">
                                                       <label className="form-label">CUSTOMER NAME</label>
-                                                      <p><input type="text" id="CustomerName" placeholder="Customer Name" /></p>
+                                                      <p><input type="text" id="CustomerName" placeholder="Customer Name" onChange={(e) => setaddOrder({ ...addOrder, customerName: e.target.value })}/></p>
                                                   </div>
                                                   <div className="form-outline">
                                                       <label className="form-label">CUSTOMER NUMBER</label>
-                                                      <p><input type="text" id="CustomerNumber" placeholder="Customer Number" /></p>
+                                                      <p><input type="text" id="CustomerNumber" placeholder="Customer Number" onChange={(e) => setaddOrder({ ...addOrder, customerNumber: e.target.value })}/></p>
                                                   </div>
                                                   <div className="form-outline">
                                                       <label className="form-label">CUSTOMER ADDRESS</label>
-                                                      <p><input type="text" id="CustomerAddress" placeholder="Customer Address" /></p>
+                                                      <p><input type="text" id="CustomerAddress" placeholder="Customer Address" onChange={(e) => setaddOrder({ ...addOrder, customerAddress: e.target.value })} /></p>
                                                   </div>
                                               </div>
                                               <div className="col-md-4">
                                                   <div className="form-outline">
                                                       <label className="form-label">INSTRUCTIONS</label>
-                                                      <p><input type="text" id="Bleaching" placeholder="Bleaching" />
-                                                      <input type="text" id="DryCleaning" placeholder="Dry Cleaning" />
-                                                      <input type="text" id="Drying" placeholder="Drying" />
-                                                      <input type="text" id="Ironing" placeholder="Ironing" />
-                                                      <input type="text" id="SpecialCare" placeholder="Special Care" />
-                                                      <input type="text" id="StainRemoval" placeholder="Stain Removal" />
-                                                      <input type="text" id="Storage" placeholder="Storage" />
-                                                      <input type="text" id="Washing" placeholder="Washing" /></p>
-                                                      <input type="text" id="Notes" placeholder="Notes" />
+                                                      <p><input type="text" id="Bleaching" placeholder="Bleaching" onChange={(e) => setaddOrder({ ...addOrder,instructions:{...addOrder.instructions,bleaching: e.target.value} })} />
+                                                      <input type="text" id="DryCleaning" placeholder="Dry Cleaning" onChange={(e) => setaddOrder({ ...addOrder, instructions:{...addOrder.instructions,dryCleaning: e.target.value} })}/>
+                                                      <input type="text" id="Drying" placeholder="Drying" onChange={(e) => setaddOrder({ ...addOrder, instructions:{...addOrder.instructions,drying: e.target.value} })}/>
+                                                      <input type="text" id="Ironing" placeholder="Ironing"onChange={(e) => setaddOrder({ ...addOrder, instructions:{...addOrder.instructions,ironing: e.target.value} })} />
+                                                      <input type="text" id="SpecialCare" placeholder="Special Care" onChange={(e) => setaddOrder({ ...addOrder, instructions:{...addOrder.instructions,specialCare: e.target.value} })}/>
+                                                      <input type="text" id="StainRemoval" placeholder="Stain Removal" onChange={(e) => setaddOrder({ ...addOrder, instructions:{...addOrder.instructions,stainRemoval: e.target.value} })}/>
+                                                      <input type="text" id="Storage" placeholder="Storage"onChange={(e) => setaddOrder({ ...addOrder, instructions:{...addOrder.instructions,storage: e.target.value} })} />
+                                                      <input type="text" id="Washing" placeholder="Washing" onChange={(e) => setaddOrder({ ...addOrder, instructions:{...addOrder.instructions,washing: e.target.value} })}/></p>
+                                                      <input type="text" id="Notes" placeholder="Notes" onChange={(e) =>setaddOrder({ ...addOrder, instructions: {...addOrder.instructions,notes: [e.target.value]}})}/>
                                                   </div>
                                               </div>
                                               <div className="col-md-4">
                                                   <div className="form-outline">
                                                       <label className="form-label">LAUNDRY INFORMATION</label>
-                                                      <p><input type="text" id="Accessories" placeholder="Accessories" />
-                                                      <input type="text" id="Activewear" placeholder="Activewear" />
-                                                      <input type="text" id="Tops" placeholder="Tops" />
-                                                      <input type="text" id="Bottoms" placeholder="Bottoms" />
-                                                      <input type="text" id="Dresses" placeholder="Dresses" />
-                                                      <input type="text" id="Formalwear" placeholder="Formalwear" />
-                                                      <input type="text" id="Sleepwear" placeholder="Sleepwear" />
-                                                      <input type="text" id="Swimwear" placeholder="Swimwear" />
-                                                      <input type="text" id="Undergarments" placeholder="Undergarments" /></p>
-                                                      <input type="text" id="Notes" placeholder="Notes" />
+                                                      <p><input type="text" id="Accessories" placeholder="Accessories" onChange={(e) => setaddOrder({ ...addOrder, laundryInfo: {...addOrder.laundryInfo,accesories: [e.target.value]}})}/>
+                                                      <input type="text" id="Activewear" placeholder="Activewear" onChange={(e) => setaddOrder({ ...addOrder, laundryInfo: {...addOrder.laundryInfo,activeWear: [e.target.value]}})}/>
+                                                      <input type="text" id="Tops" placeholder="Tops" onChange={(e) => setaddOrder({ ...addOrder, laundryInfo: {...addOrder.laundryInfo,tops: [e.target.value]}})}/>
+                                                      <input type="text" id="Bottoms" placeholder="Bottoms" onChange={(e) => setaddOrder({ ...addOrder, laundryInfo: {...addOrder.laundryInfo,bottoms: [e.target.value]}})}/>
+                                                      <input type="text" id="Dresses" placeholder="Dresses" onChange={(e) => setaddOrder({ ...addOrder, laundryInfo: {...addOrder.laundryInfo,dresses: [e.target.value]}})}/>
+                                                      <input type="text" id="Formalwear" placeholder="Formalwear" onChange={(e) => setaddOrder({ ...addOrder, laundryInfo: {...addOrder.laundryInfo,formalWear: [e.target.value]}})}/>
+                                                      <input type="text" id="Sleepwear" placeholder="Sleepwear" onChange={(e) => setaddOrder({ ...addOrder, laundryInfo: {...addOrder.laundryInfo,sleepWear: [e.target.value]}})}/>
+                                                      <input type="text" id="Swimwear" placeholder="Swimwear" onChange={(e) => setaddOrder({ ...addOrder, laundryInfo: {...addOrder.laundryInfo,swimWear: [e.target.value]}})}/>
+                                                      <input type="text" id="Undergarments" placeholder="Undergarments" onChange={(e) => setaddOrder({ ...addOrder, laundryInfo: {...addOrder.laundryInfo,undergarments: [e.target.value]}})}/></p>
+                                                      <input type="text" id="Notes" placeholder="Notes" onChange={(e) => setaddOrder({ ...addOrder, laundryInfo: {...addOrder.laundryInfo,Notes: [e.target.value]}})}/>
                                                   </div>
                                               </div>
                                           </div>
@@ -175,7 +428,7 @@ const OrderPage = () => {
                                       </form>
                                   </div>
                                   <div className="col-md-6">
-                                      Test
+                                      <img src=''></img>
                                   </div>
                               </div>
                           </div>
@@ -187,7 +440,7 @@ const OrderPage = () => {
                               </div>
                               <div className="row text-center">
                                   <div className="col-md-6">
-                                      <form className="form" onSubmit={updateOrder}>
+                                      <form className="form" onSubmit={orderUpdate}>
                                           <div className="row">
                                               <div className="col-md-4">
                                                   <div className="form-outline">
@@ -245,6 +498,7 @@ const OrderPage = () => {
                                                   <button type="button" className="btn btn-danger ps-5 pe-5 p-3" disabled>UPDATE</button>
                                               }
                                               <button className="btn btn-primary ms-5 ps-5 pe-5 p-3" onClick={()=>{setFormState('None')}}>BACK</button>
+                                              
                                           </div>
                                       </form>
                                   </div>
@@ -279,7 +533,7 @@ const OrderPage = () => {
                               </div>
                               <div className="row text-center">
                                   <div className="col-md-6">
-                                      <form className="form" onSubmit={deleteOrder}>
+                                      <form className="form" onSubmit={orderDelete}>
                                           <div className="form-outline row mb-5">
                                               <div className="col-md-4">
                                                   <label className="form-label">ORDER ID</label>
