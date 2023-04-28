@@ -15,74 +15,8 @@ const OrderPage = () => {
     const [formState, setFormState] = useState('None');
     const [isOrderValid, setIsOrderValid] = useState(false);
     const formValidator = new FormValidator();
-    const [updateOrder, setupdateOrder]= useState<{
-        id: number;  
-        customerName: string;
-        customerNumber: string;
-        customerAddress: string;
-        dateCreated: Date|null;
-        dateCompleted: Date|null;
-        employeeID: string|null;
-        instructions: {
-          bleaching: string;
-          dryCleaning: string;
-          drying: string;
-          ironing: string;
-          specialCare: string;
-          stainRemoval: string;
-          storage: string;
-          washing: string;
-          notes: string[];
-        };
-        laundryInfo: {
-          accesories: string[];
-          activeWear: string[];
-          tops: string[];
-          bottoms: string[];
-          dresses: string[];
-          formalWear: string[];
-          sleepWear: string[];
-          swimWear: string[];
-          undergarments: string[];
-          Notes: string[];
-        };
-        status: string;
-      }>({
-        id: -1,  
-        customerName: '',
-        customerNumber: '',
-        customerAddress: '',
-        dateCreated: null,
-        dateCompleted: null,
-        employeeID: null,
-        instructions: {
-          bleaching: '',
-          dryCleaning: '',
-          drying: '',
-          ironing: '',
-          specialCare: '',
-          stainRemoval: '',
-          storage: '',
-          washing: '',
-          notes: [''],
-        },
-        laundryInfo: {
-          accesories: [''],
-          activeWear: [''],
-          tops: [''],
-          bottoms: [''],
-          dresses: [''],
-          formalWear: [''],
-          sleepWear: [''],
-          swimWear: [''],
-          undergarments: [''],
-          Notes: [''],
-        },
-        status: ''
-
-       })
-
-    const [addOrder, setaddOrder] = useState<{
+    //ADD
+     const [addOrder, setaddOrder] = useState<{
         customerName: string,
         customerNumber: string,
         customerAddress: string,
@@ -137,6 +71,88 @@ const OrderPage = () => {
           undergarments: ['none'],
           Notes: ['none'],
       }})
+      //UPDATE
+    const [updateOrder, setUpdateOrder]= useState<{
+        id: string;  
+        customerName: string;
+        customerNumber: string;
+        customerAddress: string;
+        dateCreated: Date|null;
+        dateCompleted: Date|null;
+        employeeID: string|null;
+        instructions: {
+          bleaching: string;
+          dryCleaning: string;
+          drying: string;
+          ironing: string;
+          specialCare: string;
+          stainRemoval: string;
+          storage: string;
+          washing: string;
+          notes: string[];
+        };
+        laundryInfo: {
+          accesories: string[];
+          activeWear: string[];
+          tops: string[];
+          bottoms: string[];
+          dresses: string[];
+          formalWear: string[];
+          sleepWear: string[];
+          swimWear: string[];
+          undergarments: string[];
+          Notes: string[];
+        };
+        status: string;
+      }>({
+        id: '',  
+        customerName: '',
+        customerNumber: '',
+        customerAddress: '',
+        dateCreated: null,
+        dateCompleted: null,
+        employeeID: null,
+        instructions: {
+          bleaching: '',
+          dryCleaning: '',
+          drying: '',
+          ironing: '',
+          specialCare: '',
+          stainRemoval: '',
+          storage: '',
+          washing: '',
+          notes: [''],
+        },
+        laundryInfo: {
+          accesories: [''],
+          activeWear: [''],
+          tops: [''],
+          bottoms: [''],
+          dresses: [''],
+          formalWear: [''],
+          sleepWear: [''],
+          swimWear: [''],
+          undergarments: [''],
+          Notes: [''],
+        },
+        status: ''
+
+       })
+
+
+    //DELETE
+    const [deleteOrder,setDeleteOrder]= useState<{
+        id: string;
+        customerName: string ;
+        employeeID: string;
+    }>({
+        id:'',
+        customerName:'',
+        employeeID:''
+
+    })
+
+   
    
     const navigate = useNavigate();
 
@@ -211,7 +227,7 @@ const OrderPage = () => {
         e.preventDefault();
         setAlertMessage({type: '', message: '', show: false});
 
-        /*try{
+        try{
             const{
             id,  
             customerName,
@@ -264,7 +280,7 @@ const OrderPage = () => {
                 return setAlertMessage({type: 'error', message: e.message, show: true});
             }
 
-        } */
+        } 
 
     }
 
@@ -274,6 +290,23 @@ const OrderPage = () => {
         setAlertMessage({type: '', message: '', show: false});
 
         try{
+            const{
+                id,
+                customerName,
+                employeeID
+            } = deleteOrder;
+            
+            await deleteOrders(id,customerName,employeeID).then(() =>{
+
+                setRefreshCounter(prevCounter => prevCounter + 1);
+                getOrder(id,customerName,employeeID);
+                return setAlertMessage({type: 'success', message: 'User Deleted Successfully.', show: true});
+  
+            }).catch((error)=>{
+                
+                return setAlertMessage({type: 'error', message: error.message, show: true});
+  
+            });
 
         }catch(e: unknown){
             
@@ -323,6 +356,28 @@ const OrderPage = () => {
         
         
       },[addOrder])
+      
+      useEffect(() =>{
+
+        if (updateOrder.id && updateOrder.customerName && updateOrder.employeeID)
+        {
+            setIsOrderValid(true);
+        }
+        
+        
+      },[updateOrder])
+
+
+      useEffect(() =>{
+
+        if (deleteOrder.id && deleteOrder.customerName && deleteOrder.employeeID)
+        {
+            setIsOrderValid(true);
+        }
+        
+        
+      },[deleteOrder])
+
     useEffect(()=>{
         
       if(alertMessage.show){
@@ -445,15 +500,15 @@ const OrderPage = () => {
                                               <div className="col-md-4">
                                                   <div className="form-outline">
                                                       <label className="form-label">CUSTOMER NAME</label>
-                                                      <p><input type="text" id="CustomerName" placeholder="Customer Name" /></p>
+                                                      <p><input type="text" id="CustomerName" placeholder="Customer Name"  onChange={(e) =>setUpdateOrder({ ...updateOrder, customerName: e.target.value })}/></p>
                                                   </div>
                                                   <div className="form-outline">
                                                       <label className="form-label">CUSTOMER NUMBER</label>
-                                                      <p><input type="text" id="CustomerNumber" placeholder="Customer Number" /></p>
+                                                      <p><input type="text" id="CustomerNumber" placeholder="Customer Number" onChange={(e) =>setUpdateOrder({ ...updateOrder, customerName: e.target.value })}/></p>
                                                   </div>
                                                   <div className="form-outline">
                                                       <label className="form-label">CUSTOMER ADDRESS</label>
-                                                      <p><input type="text" id="CustomerAddress" placeholder="Customer Address" /></p>
+                                                      <p><input type="text" id="CustomerAddress" placeholder="Customer Address" onChange={(e) =>setUpdateOrder({ ...updateOrder, customerName: e.target.value })}/></p>
                                                   </div>
                                                   <div className="form-outline">
                                                       <label className="form-label">DATE ORDER</label>
@@ -464,30 +519,30 @@ const OrderPage = () => {
                                               <div className="col-md-4">
                                                   <div className="form-outline">
                                                       <label className="form-label">INSTRUCTIONS</label>
-                                                      <p><input type="text" id="Bleaching" placeholder="Bleaching" />
-                                                      <input type="text" id="DryCleaning" placeholder="Dry Cleaning" />
-                                                      <input type="text" id="Drying" placeholder="Drying" />
-                                                      <input type="text" id="Ironing" placeholder="Ironing" />
-                                                      <input type="text" id="SpecialCare" placeholder="Special Care" />
-                                                      <input type="text" id="StainRemoval" placeholder="Stain Removal" />
-                                                      <input type="text" id="Storage" placeholder="Storage" />
-                                                      <input type="text" id="Washing" placeholder="Washing" /></p>
-                                                      <input type="text" id="Notes" placeholder="Notes" />
+                                                      <p><input type="text" id="Bleaching" placeholder="Bleaching"  onChange={(e) => setUpdateOrder({ ...updateOrder,instructions:{...updateOrder.instructions,bleaching: e.target.value} })}/>
+                                                      <input type="text" id="DryCleaning" placeholder="Dry Cleaning" onChange={(e) => setUpdateOrder({ ...updateOrder,instructions:{...updateOrder.instructions,dryCleaning: e.target.value} })} />
+                                                      <input type="text" id="Drying" placeholder="Drying"  onChange={(e) => setUpdateOrder({ ...updateOrder,instructions:{...updateOrder.instructions,drying: e.target.value} })}/>
+                                                      <input type="text" id="Ironing" placeholder="Ironing" onChange={(e) => setUpdateOrder({ ...updateOrder,instructions:{...updateOrder.instructions,ironing: e.target.value} })} />
+                                                      <input type="text" id="SpecialCare" placeholder="Special Care"  onChange={(e) => setUpdateOrder({ ...updateOrder,instructions:{...updateOrder.instructions,specialCare: e.target.value} })}/>
+                                                      <input type="text" id="StainRemoval" placeholder="Stain Removal"  onChange={(e) => setUpdateOrder({ ...updateOrder,instructions:{...updateOrder.instructions,stainRemoval: e.target.value} })}/>
+                                                      <input type="text" id="Storage" placeholder="Storage"  onChange={(e) => setUpdateOrder({ ...updateOrder,instructions:{...updateOrder.instructions,storage: e.target.value} })}/>
+                                                      <input type="text" id="Washing" placeholder="Washing"  onChange={(e) => setUpdateOrder({ ...updateOrder,instructions:{...updateOrder.instructions,washing: e.target.value} })}/></p>
+                                                      <input type="text" id="Notes" placeholder="Notes"  onChange={(e) => setUpdateOrder({ ...updateOrder,instructions:{...updateOrder.instructions,notes: [e.target.value]} })}/>
                                                   </div>
                                               </div>
                                               <div className="col-md-4">
                                                   <div className="form-outline">
                                                       <label className="form-label">LAUNDRY INFORMATION</label>
-                                                      <p><input type="text" id="Accessories" placeholder="Accessories" />
-                                                      <input type="text" id="Activewear" placeholder="Activewear" />
-                                                      <input type="text" id="Tops" placeholder="Tops" />
-                                                      <input type="text" id="Bottoms" placeholder="Bottoms" />
-                                                      <input type="text" id="Dresses" placeholder="Dresses" />
-                                                      <input type="text" id="Formalwear" placeholder="Formalwear" />
-                                                      <input type="text" id="Sleepwear" placeholder="Sleepwear" />
-                                                      <input type="text" id="Swimwear" placeholder="Swimwear" />
-                                                      <input type="text" id="Undergarments" placeholder="Undergarments" /></p>
-                                                      <input type="text" id="Notes" placeholder="Notes" />
+                                                      <p><input type="text" id="Accessories" placeholder="Accessories" onChange={(e) => setUpdateOrder({ ...updateOrder, laundryInfo: {...updateOrder.laundryInfo,accesories: [e.target.value]}})} />
+                                                      <input type="text" id="Activewear" placeholder="Activewear"onChange={(e) => setUpdateOrder({ ...updateOrder, laundryInfo: {...updateOrder.laundryInfo,activeWear: [e.target.value]}})} />
+                                                      <input type="text" id="Tops" placeholder="Tops" onChange={(e) => setUpdateOrder({ ...updateOrder, laundryInfo: {...updateOrder.laundryInfo,tops: [e.target.value]}})}/>
+                                                      <input type="text" id="Bottoms" placeholder="Bottoms" onChange={(e) => setUpdateOrder({ ...updateOrder, laundryInfo: {...updateOrder.laundryInfo,bottoms: [e.target.value]}})}/>
+                                                      <input type="text" id="Dresses" placeholder="Dresses" onChange={(e) => setUpdateOrder({ ...updateOrder, laundryInfo: {...updateOrder.laundryInfo,dresses: [e.target.value]}})}/>
+                                                      <input type="text" id="Formalwear" placeholder="Formalwear" onChange={(e) => setUpdateOrder({ ...updateOrder, laundryInfo: {...updateOrder.laundryInfo,formalWear: [e.target.value]}})}/>
+                                                      <input type="text" id="Sleepwear" placeholder="Sleepwear" onChange={(e) => setUpdateOrder({ ...updateOrder, laundryInfo: {...updateOrder.laundryInfo,sleepWear: [e.target.value]}})}/>
+                                                      <input type="text" id="Swimwear" placeholder="Swimwear" onChange={(e) => setUpdateOrder({ ...updateOrder, laundryInfo: {...updateOrder.laundryInfo,swimWear: [e.target.value]}})}/>
+                                                      <input type="text" id="Undergarments" placeholder="Undergarments" onChange={(e) => setUpdateOrder({ ...updateOrder, laundryInfo: {...updateOrder.laundryInfo,undergarments: [e.target.value]}})}/></p>
+                                                      <input type="text" id="Notes" placeholder="Notes" onChange={(e) => setUpdateOrder({ ...updateOrder, laundryInfo: {...updateOrder.laundryInfo,Notes: [e.target.value]}})} />
                                                   </div>
                                               </div>
                                           </div>
@@ -505,16 +560,16 @@ const OrderPage = () => {
                                   <div className="col-md-6">
                                       <div className="form-outline row mb-5">
                                           <div className="col-md-4">
-                                              <label className="form-label">ORDER ID</label>
-                                              <input type="text" id="OrderID" placeholder="Order ID" />
+                                              <label className="form-label">ORDER ID </label>
+                                              <input type="text" id="OrderID" placeholder="Order ID" onChange={(e) =>setUpdateOrder({ ...updateOrder, id: e.target.value })} />
                                           </div>
                                           <div className="col-md-4">
                                               <label className="form-label">EMPLOYEE ID</label>
-                                              <input type="text" id="EmployeeID" placeholder="Employee ID" />
+                                              <input type="text" id="EmployeeID" placeholder="Employee ID" onChange={(e) =>setUpdateOrder({ ...updateOrder, employeeID: e.target.value })} />
                                           </div>
                                           <div className="col-md-4">
                                               <label className="form-label">STATUS</label>
-                                              <input type="text" id="OrderID" placeholder="Status" />
+                                              <input type="text" id="OrderID" placeholder="Status" onChange={(e) =>setUpdateOrder({ ...updateOrder, status: e.target.value })}/>
                                           </div>
                                       </div>
                                       <div className="row">
@@ -537,15 +592,15 @@ const OrderPage = () => {
                                           <div className="form-outline row mb-5">
                                               <div className="col-md-4">
                                                   <label className="form-label">ORDER ID</label>
-                                                  <input type="text" id="OrderID" placeholder="Order ID" />
+                                                  <input type="text" id="OrderID" placeholder="Order ID" onChange={(e) =>setDeleteOrder({ ...deleteOrder, id: e.target.value })}/>
                                               </div>
                                               <div className="col-md-4">
                                                   <label className="form-label">EMPLOYEE ID</label>
-                                                  <input type="text" id="EmployeeID" placeholder="Employee ID" />
+                                                  <input type="text" id="EmployeeID" placeholder="Employee ID"onChange={(e) =>setDeleteOrder({ ...deleteOrder, employeeID: e.target.value })} />
                                               </div>
                                               <div className="col-md-4">
                                                   <label className="form-label">CUSTOMER NAME</label>
-                                                  <input type="text" id="CustomerName" placeholder="Customer Name" />
+                                                  <input type="text" id="CustomerName" placeholder="Customer Name" onChange={(e) =>setDeleteOrder({ ...deleteOrder, customerName: e.target.value })}/>
                                               </div>
                                           </div>
                                           <div className="form-outline m-5">
