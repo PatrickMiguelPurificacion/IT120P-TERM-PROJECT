@@ -5,6 +5,9 @@ import logo from '../../assets/stock-page/FabricFinesse.png';
 import { Link, useNavigate } from 'react-router-dom';
 import Alert from '../alerts/Alerts';
 import { InventoryAuth } from '../../context/InventoryContext';
+import { string } from 'prop-types';
+import { collection, documentId } from '@firebase/firestore';
+import { Item } from '@firebase/analytics';
 
 const StockPage = () => {
 
@@ -13,10 +16,8 @@ const StockPage = () => {
     const [formState, setFormState] = useState('None');
     const [isItemValid, setIsItemValid] = useState(false);
     const navigate = useNavigate();
-    const {item, allItems, addItems, updateItems, deleteItem, getItem,  getItems}= InventoryAuth ();
-
+    const {item, allItems, addItems, updateItems, deleteItems, getItem,getItems}= InventoryAuth ();
     const [ItemsAdd, setaddItem] = useState<{
-        id: number;
         name: string;
         brand: string[];
         code: string[];
@@ -25,7 +26,6 @@ const StockPage = () => {
         totalPrice: number;
         purpose: string[];
       }>({
-        id: 0,
         name: '',
         brand: [],
         code: [],
@@ -37,7 +37,7 @@ const StockPage = () => {
       
       //declaring for items update
       const [ItemsUpdate, setUpdateItem] = useState<{
-        id: number;
+        id: string;
         name: string;
         brand: string[];
         code: string[];
@@ -46,7 +46,7 @@ const StockPage = () => {
         totalPrice: number;
         purpose: string[];
       }>({
-        id: 0,
+        id: '',
         name: '',
         brand: [],
         code: [],
@@ -55,12 +55,27 @@ const StockPage = () => {
         totalPrice: 0,
         purpose: [],
       });
+
+      // delete items
+
+      const [deleteItem, setdeleteItem] = useState<{
+        id: string;
+        name: string;
+        brand: string[];
+        code: string[];
+      }>({
+        id: '',
+        name: '',
+        brand: [],
+        code: [],
+        
+      });
     const goToInvTable = () =>{
 
         navigate("/dashboard/stock-display");
 
     }
-
+    
     const addItem: FormEventHandler<HTMLFormElement> = async (e) => {
 
         e.preventDefault();
@@ -95,13 +110,13 @@ const StockPage = () => {
       
         }
     }
-           
-          // not yet done  
+    
+
     const itemUpdate: FormEventHandler<HTMLFormElement> = async (e) => {
 
         e.preventDefault();
         setAlertMessage({type: '', message: '', show: false});
-
+       
         try{
             const {
                 id,
@@ -116,6 +131,7 @@ const StockPage = () => {
               await updateItems(id,name,brand,code,quantity,unitPrice,totalPrice,purpose)
               .then(()=>{
                   setRefreshCounter(prevCounter => prevCounter + 1);
+                  getItem(id,name,brand,code);
                   return setAlertMessage({type: 'success', message: 'Order Updated Successfully.', show: true});
               })
         }catch(e: unknown){
@@ -135,16 +151,28 @@ const StockPage = () => {
         setAlertMessage({type: '', message: '', show: false});
 
         try{
+            const {
+                id,
+                name,
+                brand,
+                code,
+              } = deleteItem;
+              await deleteItems(id,name,brand,code)
+              
+              .then(()=>{
+                setRefreshCounter(prevCounter => prevCounter + 1);
+                getItem(id,name,brand,code);
+                return setAlertMessage({type: 'success', message: 'Order Deleted Successfully.', show: true});
+            })
+      }catch(e: unknown){
+          
+          if(e instanceof Error){
+              return setAlertMessage({type: 'error', message: e.message, show: true});
+          }
 
-        }catch(e: unknown){
-            
-            if(e instanceof Error){
-                return setAlertMessage({type: 'error', message: e.message, show: true});
-            }
+      }
 
-        }
-
-    }
+  }
     useEffect(() =>{
 
         if (ItemsAdd.name && ItemsAdd.brand && ItemsAdd.code)
@@ -172,13 +200,24 @@ const StockPage = () => {
         
         
       },[ItemsUpdate])
-    useEffect(()=>{
 
-      if(alertMessage.show){
-          setTimeout(()=>{setAlertMessage({type: '', message: '', show: false})}, 5000)
-      }
+      useEffect(()=>{
 
-    },[alertMessage.message]);
+        if(alertMessage.show){
+            setTimeout(()=>{setAlertMessage({type: '', message: '', show: false})}, 5000)
+        }
+  
+      },[alertMessage.message]);
+      
+      useEffect(() =>{
+  
+          if (deleteItem.name && deleteItem.brand && deleteItem.code)
+          {
+              setIsItemValid(true);
+          }
+          
+          
+        },[deleteItem])
 
     return (
       <>
@@ -280,37 +319,37 @@ const StockPage = () => {
                                             <div className="col-md-6">
                                                 <div className="form-outline">
                                                     <label className="form-label">ITEM ID</label>
-                                                    <p><input type="text" id="ItemId" placeholder="Item ID" onChange={(e) => setUpdateItem({ ...ItemsUpdate, id: parseInt(e.target.value) })}/></p>
+                                                    <p><input type="text" id="ItemId" placeholder="Item ID" onChange={(e) => setUpdateItem({ ...ItemsUpdate, id: e.target.value })}/></p>
                                                     </div>
                                                 <div className="form-outline">
                                                     <label className="form-label">ITEM NAME</label>
-                                                    <p><input type="text" id="ItemName" placeholder="Item Name" /></p>
+                                                    <p><input type="text" id="ItemName" placeholder="Item Name"onChange={(e) => setUpdateItem({ ...ItemsUpdate, name: (e.target.value) })}/></p>
                                                 </div>
                                                 <div className="form-outline">
                                                     <label className="form-label">ITEM BRAND</label>
-                                                    <p><input type="text" id="ItemBrand" placeholder="Item Brand" /></p>
+                                                    <p><input type="text" id="ItemBrand" placeholder="Item Brand" onChange={(e) => setUpdateItem({ ...ItemsUpdate, brand: [e.target.value] })}/> </p>
                                                 </div>
                                                 <div className="form-outline">
                                                     <label className="form-label">ITEM CODE</label>
-                                                    <p><input type="text" id="ItemCode" placeholder="Item Code" /></p>
+                                                    <p><input type="text" id="ItemCode" placeholder="Item Code" onChange={(e) => setUpdateItem({ ...ItemsUpdate, code: [e.target.value] })}/> /</p>
                                                 </div>
                                             </div>
                                             <div className="col-md-6">
                                                 <div className="form-outline">
                                                     <label className="form-label">QUANTITY</label>
-                                                    <p><input type="text" inputMode='numeric' id="Quantity" placeholder="Quantity" /></p>
+                                                    <p><input type="text" inputMode='numeric' id="Quantity" placeholder="Quantity" onChange={(e) => setUpdateItem({ ...ItemsUpdate, quantity: parseInt (e.target.value) })}/></p>
                                                 </div>
                                                 <div className="form-outline">
                                                     <label className="form-label">UNIT PRICE</label>
-                                                    <p><input type="text" inputMode='numeric' id="ItemUnitPrice" placeholder="Unit Price" /></p>
+                                                    <p><input type="text" inputMode='numeric' id="ItemUnitPrice" placeholder="Unit Price"  onChange={(e) => setUpdateItem({ ...ItemsUpdate, unitPrice: parseFloat(e.target.value) })}/></p>
                                                 </div>
                                                 <div className="form-outline">
                                                     <label className="form-label">TOTAL PRICE</label>
-                                                    <p><input type="text" inputMode='numeric' id="ItemTotalPrice" placeholder="Total Price" /></p>
+                                                    <p><input type="text" inputMode='numeric' id="ItemTotalPrice" placeholder="Total Price"  onChange={(e) => setUpdateItem({ ...ItemsUpdate, totalPrice: parseFloat(e.target.value) })}/></p>
                                                 </div>
                                                 <div className="form-outline">
                                                     <label className="form-label">PURPOSE</label>
-                                                    <p><input type="text" id="Purpose" placeholder="Item Purpose" /></p>
+                                                    <p><input type="text" id="Purpose" placeholder="Item Purpose" onChange={(e) => setUpdateItem({ ...ItemsUpdate, purpose: [e.target.value] })} /></p>
                                                 </div>
                                             </div>
                                           </div>
@@ -342,21 +381,21 @@ const StockPage = () => {
                                           <div className="col-md-6">
                                               <div className="form-outline">
                                                   <label className="form-label">ITEM ID</label>
-                                                  <p><input type="text" id="ItemId" placeholder="Item ID" /></p>
+                                                  <p><input type="text" id="ItemId" placeholder="Item ID" onChange={(e) => setdeleteItem({ ...deleteItem, id: e.target.value })}/></p>
                                               </div>
                                               <div className="form-outline">
                                                   <label className="form-label">ITEM NAME</label>
-                                                  <p><input type="text" id="ItemName" placeholder="Item Name" /></p>
+                                                  <p><input type="text" id="ItemName" placeholder="Item Name" onChange={(e) => setdeleteItem({ ...deleteItem, name: e.target.value })}/></p>
                                               </div>
                                           </div>
                                           <div className="col-md-6">
                                               <div className="form-outline">
                                                   <label className="form-label">ITEM BRAND</label>
-                                                  <p><input type="text" id="ItemBrand" placeholder="Item Brand" /></p>
+                                                  <p><input type="text" id="ItemBrand" placeholder="Item Brand"onChange={(e) => setdeleteItem({ ...deleteItem, brand: [e.target.value] })}/></p>
                                               </div>
                                               <div className="form-outline">
                                                   <label className="form-label">ITEM CODE</label>
-                                                  <p><input type="text" id="ItemCode" placeholder="Item Code" /></p>
+                                                  <p><input type="text" id="ItemCode" placeholder="Item Code"onChange={(e) => setdeleteItem({ ...deleteItem,code: [e.target.value] })}/></p>
                                               </div>
                                           </div>
                                         </div>

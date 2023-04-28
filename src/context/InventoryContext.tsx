@@ -1,11 +1,11 @@
 import { EmailAuthProvider, User as FirebaseUser, createUserWithEmailAndPassword, getAuth, onAuthStateChanged, reauthenticateWithCredential, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { FieldValue, arrayUnion, collection, doc, documentId, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore';
+import { DocumentData, FieldValue, Query, arrayUnion, collection, deleteDoc, doc, documentId, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore';
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from '../scripts/firebase-init';
 import { StorageAuth } from './StorageContext';
 
 interface Item{
-    id: number;  
+    id: string;  
     name: string;
     brand: string[];
     code: string[];
@@ -25,7 +25,7 @@ interface AddItem{
 }
 
 interface UpdateItem{
-    id: number;  
+    id: string;  
     name: string;
     brand: string[];
     code: string[];
@@ -36,7 +36,7 @@ interface UpdateItem{
 }
 
 interface DeleteItem{
-    id: number;  
+    id: string;  
     name: string;
     brand: string[];
     code: string[];
@@ -57,7 +57,7 @@ export const InventoryContext = createContext<{
       purpose: string[],
     ) => Promise<void>;
     updateItems:(
-      id: number,
+      id: string,
       name: string,
       brand: string[],
       code: string[],
@@ -67,13 +67,13 @@ export const InventoryContext = createContext<{
       purpose: string[],
     ) => Promise<void>;
     deleteItems:(
-      id: number,
+      id: string,
       name: string,
       brand: string[],
       code: string[],
     ) => Promise<void>;
     getItem:(
-      id: number,
+      id: string,
       name: string,
       brand: string[],
       code: string[],
@@ -151,7 +151,7 @@ export const InventoryContextProvider = ({children}: {children: ReactNode}) =>{
     }
 
     const updateItems = async (
-        id: number,
+        id: string,
         name: string,
         brand: string[],
         code: string[],
@@ -170,8 +170,24 @@ export const InventoryContextProvider = ({children}: {children: ReactNode}) =>{
             Quantity: quantity,                
             Unit_Price:  unitPrice,
             Total_Price: (unitPrice*quantity),
+           
           }
-          const auth = getAuth();
+          const itemsCollection = collection(db, 'Inventory');
+          const itemsDocRef = doc(itemsCollection,id);
+          await updateDoc(itemsDocRef, item);
+          await getItem(id,name,brand,code);
+          setUpdateItem({
+            id: id,
+            brand: brand,
+            code: code,
+            name: name,
+            purpose: purpose,
+            quantity: quantity,
+            totalPrice:totalPrice,
+            unitPrice: unitPrice
+          })
+            
+          
        
         } catch (error) {
 
@@ -179,21 +195,38 @@ export const InventoryContextProvider = ({children}: {children: ReactNode}) =>{
             throw error;
 
         }
-           const auth = getAuth();
+         
     }
 
     const deleteItems = async (
-        id?: number | null,
-        name?: string | null,
-        brand?: string[] | null,
-        code?: string[] | null,
+        id: string, 
+        name: string,
+        brand: string[] ,
+        code: string[]
     ) => {
 
         try {
-
-
-
-        } catch (error) {
+          const item = {
+            id: id,
+            Brand: brand,
+            Code:  code,
+            Name:  name,     
+          }
+          const itemsCollection = collection(db, 'Inventory');
+          const itemsDocRef = doc(itemsCollection,id);
+          await deleteDoc(itemsDocRef);
+          await getItem(id,name,brand,code);
+          setDeleteItem({
+            id: id,
+            brand: brand,
+            code: code,
+            name: name,
+          })
+      
+          
+        }
+         
+         catch (error) {
 
             console.error(error);
             throw error;
@@ -202,17 +235,44 @@ export const InventoryContextProvider = ({children}: {children: ReactNode}) =>{
     }
 
     const getItem = async (
-        id?: number | null,
+        id: string ,
         name?: string | null,
         brand?: string[] | null,
         code?: string[] | null,
     ) => {
 
         try {
+          
+          let item: Item | null = null;
+          let itemsDocRef: Query<DocumentData> |null = null;
+          if (id)
+          {
+            itemsDocRef = query(collection(db,'Inventory'), where(documentId(), "==", id))
+          }
+          if (itemsDocRef){
+              const itemQuery = await getDocs(itemsDocRef);
+          
+          if (!itemQuery.empty){
+            
+            itemQuery.forEach((itemData) => {
+              item = {
+                  id:itemData.data().ID,
+                  brand: itemData.data().Brand,
+                  code:  itemData.data().Code,
+                  name:  itemData.data().Name,
+                  purpose: itemData.data().Purpose,
+                  quantity: itemData.data().Quantity,               
+                  unitPrice: itemData.data().Unit_Price,
+                  totalPrice:itemData.data().Total_Price,               
+              };
+          });
 
-
-
-        } catch (error) {
+          if (item) {
+              return setItem(item);
+            }
+          }
+          return setItem(null);
+        }}catch (error) {
 
             console.error(error);
             throw error;
