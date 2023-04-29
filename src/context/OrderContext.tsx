@@ -378,8 +378,6 @@ export const OrderContextProvider = ({children}: {children: ReactNode}) =>{
 
         try {
 
-
-
         } catch (error) {
 
             console.error(error);
