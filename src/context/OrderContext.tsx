@@ -3,6 +3,7 @@ import { DocumentData, FieldValue, Query, arrayUnion, collection, deleteDoc, doc
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from '../scripts/firebase-init';
 import { StorageAuth } from './StorageContext';
+import { id } from 'date-fns/locale';
 
 interface Order{
   id: string;  
@@ -108,10 +109,16 @@ interface DeleteOrder{
   customerName: string;
   employeeID: string;
 }
+interface OrderDisplay{
+  id: string;
+  customerName: string;
+  employeeId: string;
+  status: string;
+}
   
 export const OrderContext = createContext<{
     order: Order | null;
-    allOrders: Order[] | null;
+    allOrders: OrderDisplay[] | null;
     addOrder: AddOrder | null;
     updateOrder: UpdateOrder | null;
     deleteOrder: DeleteOrder | null;
@@ -215,7 +222,7 @@ export const OrderContext = createContext<{
 export const OrderContextProvider = ({children}: {children: ReactNode}) =>{
   
     const [order, setOrder] = useState<Order | null>(null);
-    const [allOrders, setAllOrders] = useState<Order[] | null>(null);
+    const [allOrders, setAllOrders] = useState<OrderDisplay[] | null>(null);
     const [addOrder, setAddOrder] = useState<AddOrder | null>(null);
     const [updateOrder, setUpdateOrder] = useState<UpdateOrder | null>(null);
     const [deleteOrder, setDeleteOrder] = useState<DeleteOrder | null>(null);
@@ -499,23 +506,43 @@ export const OrderContextProvider = ({children}: {children: ReactNode}) =>{
 
             console.error(error);
             throw error;
-
         }
     }
 
     const getOrders = async () => {
+      try {
+        setAllOrders([]);
+        const existingOrdersCollection = collection(db, 'Orders');
+        const existingOrdersQuery = query(existingOrdersCollection, limit(25));
+        const existingOrdersSnap = await getDocs(existingOrdersQuery);
+        
+        if (!existingOrdersSnap.empty) {
 
-        try {
-
-
-
-        } catch (error) {
-
-            console.error(error);
-            throw error;
-
+          existingOrdersSnap.forEach((doc) => {
+           
+              const id = doc.id;
+              const customerName = doc.data().Customer_Name;
+              const employeeId = doc.data().Employee_ID;
+              const status = doc.data().Status;
+              setAllOrders((prevOrderDisplay) => [
+                ...prevOrderDisplay as OrderDisplay[],
+                {
+                  id: id,
+                  customerName: customerName,
+                  employeeId:employeeId,
+                  status: status,              
+                },
+              ]);
+          });
         }
-    }
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    };
+    
+    
+    
 
     useEffect(() =>{
 

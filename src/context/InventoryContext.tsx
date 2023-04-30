@@ -1,11 +1,9 @@
-import { EmailAuthProvider, User as FirebaseUser, createUserWithEmailAndPassword, getAuth, onAuthStateChanged, reauthenticateWithCredential, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { FieldValue, arrayUnion, collection, doc, documentId, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore';
+import { collection, deleteDoc, doc, documentId, getDocs, limit, query, setDoc, updateDoc, where } from 'firebase/firestore';
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
-import { auth, db } from '../scripts/firebase-init';
-import { StorageAuth } from './StorageContext';
+import { db } from '../scripts/firebase-init';
 
 interface Item{
-    id: number;  
+    id: string;  
     name: string;
     brand: string[];
     code: string[];
@@ -25,7 +23,7 @@ interface AddItem{
 }
 
 interface UpdateItem{
-    id: number;  
+    id: string;  
     name: string;
     brand: string[];
     code: string[];
@@ -36,15 +34,25 @@ interface UpdateItem{
 }
 
 interface DeleteItem{
-    id: number;  
+    id: string;  
     name: string;
     brand: string[];
     code: string[];
 }
-  
+interface StockDisplay{
+  id: string;
+  name: string;
+  brand: string[];
+  code: string[];
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  purpose: string[];
+}
+
 export const InventoryContext = createContext<{
     item: Item | null;
-    allItems: Item[] | null;
+    allItems: StockDisplay[] | null;
     addItem: AddItem | null;
     updateItem: UpdateItem | null;
     deleteItem: DeleteItem | null;
@@ -57,7 +65,7 @@ export const InventoryContext = createContext<{
       purpose: string[],
     ) => Promise<void>;
     updateItems:(
-      id: number,
+      id: string,
       name: string,
       brand: string[],
       code: string[],
@@ -67,16 +75,14 @@ export const InventoryContext = createContext<{
       purpose: string[],
     ) => Promise<void>;
     deleteItems:(
-      id: number,
+      id: string,
       name: string,
       brand: string[],
       code: string[],
     ) => Promise<void>;
     getItem:(
-      id: number,
-      name: string,
-      brand: string[],
-      code: string[],
+      id: string,
+      type: string
     ) => Promise<void>;
     getItems:() => Promise<void>;
   }>({
@@ -105,7 +111,7 @@ export const InventoryContext = createContext<{
 export const InventoryContextProvider = ({children}: {children: ReactNode}) =>{
   
     const [item, setItem] = useState<Item | null>(null);
-    const [allItems, setAllItems] = useState<Item[] | null>(null);
+    const [allItems, setAllItems] = useState<StockDisplay[] | null>(null);
     const [addItem, setAddItem] = useState<AddItem | null>(null);
     const [updateItem, setUpdateItem] = useState<UpdateItem | null>(null);
     const [deleteItem, setDeleteItem] = useState<DeleteItem | null>(null);
@@ -117,22 +123,36 @@ export const InventoryContextProvider = ({children}: {children: ReactNode}) =>{
       quantity: number,
       unitPrice: number,
       purpose: string[],
+     
     ) => {
 
         try {
 
-
-
+            const item = {
+                Brand: brand,
+                Code:  code,
+                Name:  name,
+                Purpose: purpose,
+                Quantity: quantity,                
+                Unit_Price:  unitPrice,
+                Total_Price: (unitPrice*quantity),
+                
+            }
+            const itemsCollection = collection(db, 'Inventory');
+            const itemsDocRef = doc(itemsCollection);
+            await setDoc(itemsDocRef,{...item,Item_ID:itemsDocRef.id});
+           
         } catch (error) {
 
             console.error(error);
             throw error;
 
         }
+    
     }
 
     const updateItems = async (
-        id: number,
+        id: string,
         name: string,
         brand: string[],
         code: string[],
@@ -143,29 +163,52 @@ export const InventoryContextProvider = ({children}: {children: ReactNode}) =>{
     ) => {
 
         try {
-
-
-
+          const item = {
+            Brand: brand,
+            Code:  code,
+            Name:  name,
+            Purpose: purpose,
+            Quantity: quantity,                
+            Unit_Price:  unitPrice,
+            Total_Price: (unitPrice*quantity),
+           
+          }
+          const itemsCollection = collection(db, 'Inventory');
+          const itemsDocRef = doc(itemsCollection,id);
+          await updateDoc(itemsDocRef, item);
+          await getItem(id, 'update');
+       
         } catch (error) {
 
             console.error(error);
             throw error;
 
         }
+         
     }
 
     const deleteItems = async (
-        id?: number | null,
-        name?: string | null,
-        brand?: string[] | null,
-        code?: string[] | null,
+        id: string, 
+        name: string,
+        brand: string[],
+        code: string[]
     ) => {
 
         try {
-
-
-
-        } catch (error) {
+          const item = {
+            id: id,
+            name: name,
+            brand: brand,
+            code: code,     
+          }
+          const itemsCollection = collection(db, 'Inventory');
+          const itemsDocRef = doc(itemsCollection,id);
+          await deleteDoc(itemsDocRef);
+          setDeleteItem(null);
+          
+        }
+         
+         catch (error) {
 
             console.error(error);
             throw error;
@@ -173,38 +216,102 @@ export const InventoryContextProvider = ({children}: {children: ReactNode}) =>{
         }
     }
 
-    const getItem = async (
-        id?: number | null,
-        name?: string | null,
-        brand?: string[] | null,
-        code?: string[] | null,
-    ) => {
+    const getItem = async (id: string, type: string) => {
 
         try {
 
+          const itemsDocRef = query(collection(db,'Inventory'), where(documentId(), "==", id));
+          const itemQuery = await getDocs(itemsDocRef);
 
+          if (!itemQuery.empty){
+            
+            itemQuery.forEach((itemData) => {
 
-        } catch (error) {
+              if(itemData.id === id){
+
+                if(type === 'update'){
+                    
+                  return setUpdateItem({
+                      id: itemData.data().Item_ID,
+                      brand: itemData.data().Brand,
+                      code: itemData.data().Code,
+                      name: itemData.data().Name,
+                      purpose: itemData.data().Purpose,
+                      quantity: itemData.data().Quantity,               
+                      unitPrice: itemData.data().Unit_Price,
+                      totalPrice: itemData.data().Total_Price,               
+                  });
+
+                }else{
+
+                  return setDeleteItem({
+                    id: itemData.data().Item_ID,
+                    brand: itemData.data().Brand,
+                    code: itemData.data().Code,
+                    name: itemData.data().Name             
+                });
+
+                }
+
+              }
+
+            });
+
+          }else{
+
+            throw new Error('Item Not Found.')
+
+          }
+
+        }catch (error) {
 
             console.error(error);
             throw error;
 
         }
+
     }
 
     const getItems = async () => {
+      try {
+        setAllItems([]);
+        const existingInventoryCollection = collection(db, 'Inventory');
+        const existingInventoryQuery = query(existingInventoryCollection, limit(25));
+        const existingInventorySnap = await getDocs(existingInventoryQuery);
 
-        try {
+        if (!existingInventorySnap.empty) {
 
+          existingInventorySnap.forEach((doc) => {
+           
+              const id = doc.id;
+              const Name = doc.data().Name;
+              const Brand = doc.data().Brand;
+              const Code = doc.data().Code;
+              const Quantity = doc.data().Quantity;
+              const unitPrice = doc.data().Unit_Price;
+              const totalPrice = doc.data().Total_Price;
+              const purpose = doc.data().Purpose;
+              setAllItems((prevStockDisplay) => [
+                ...prevStockDisplay as StockDisplay[],
+                {
+                  id: id,
+                  name: Name,
+                  brand:Brand,
+                  code: Code,
+                  quantity:Quantity,
+                  unitPrice:unitPrice,
+                  totalPrice:totalPrice,
+                  purpose:purpose,
 
-
-        } catch (error) {
-
-            console.error(error);
-            throw error;
-
+                },
+              ]);
+          });
         }
-    }
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    };
   
     useEffect(() =>{
   

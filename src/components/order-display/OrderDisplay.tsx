@@ -1,67 +1,51 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import OrderDisplayCSS from './OrderDisplay.module.css'
 import Employee from '../employee/Employee'
 import logo from '../../assets/order-display/FabricFinesse.png'
-import { InventoryAuth } from '../../context/InventoryContext'
 import ReactPaginate from 'react-paginate'
 import Alert from '../alerts/Alerts'
 import { OrderAuth } from '../../context/OrderContext'
+import { UserAuth } from '../../context/UserContext'
 
 const OrderDisplay = () => {
   
     const [alertMessage, setAlertMessage] = useState({type: '', message:'', show: false});
     const [refreshCounter, setRefreshCounter] = useState(0);
+    const [isLoaded, setIsLoaded] = useState(false);
     const [pageCount, setPageCount] = useState(0);
     const [itemOffset, setItemOffset] = useState(0);
     const {getOrders, allOrders} = OrderAuth();
+    const {currentEmployee} = UserAuth();
     const [currentOrders, setCurrentOrders] = useState([{
-        id: 0,
+        id: "",
         customerName: "",
-        customerNumber: "",
-        customerAddress: "",
-        dateCreated: new Date(0),
-        dateCompleted: new Date(0),
-        employeeID: 0,
-        instructions: {
-          bleaching: "",
-          dryCleaning: "",
-          drying: "",
-          ironing: "",
-          specialCare: "",
-          stainRemoval: "",
-          storage: "",
-          washing: "",
-          notes: [""]
-        },
-        laundryInfo: {
-          accesories: [""],
-          activeWear: [""],
-          tops: [""],
-          bottoms: [""],
-          dresses: [""],
-          formalWear: [""],
-          sleepWear: [""],
-          swimWear: [""],
-          undergarments: [""],
-          notes: [""],
-        },
-        status: "",
+        employeeId: "",
+        status:"",
     }]);
 
     const handlePageClick = (event: { selected: number; }) => {
       
       const newOffset = event.selected * 5 % allOrders!.length;
-      console.log(`User requested page number ${event.selected}, which is offset ${newOffset}`);
       setItemOffset(newOffset);
 
     }
 
     useEffect(()=>{
 
-      getOrders();
+        if(isLoaded){
+            getOrders();
+        }
 
-    },[allOrders]);
+    },[isLoaded]);
 
+    useEffect(()=>{
+
+        setCurrentOrders([]);
+        setRefreshCounter(prevCounter => prevCounter + 1);
+        setIsLoaded(true);
+
+    },[]);
+    
     useEffect(()=>{
 
       if(alertMessage.show){
@@ -75,13 +59,12 @@ const OrderDisplay = () => {
         if(allOrders){
 
             const endOffset = itemOffset + 5;
-            console.log(`Loading items from ${itemOffset} to ${endOffset}`);
             setCurrentOrders(allOrders!.slice(itemOffset, endOffset));
             setPageCount(Math.ceil(allOrders!.length / 5));
 
         }
 
-    }, [itemOffset, 5]);
+    }, [allOrders, itemOffset, 5]);
 
     return (
       <>
@@ -101,8 +84,9 @@ const OrderDisplay = () => {
                             <table className="table table-light table-bordered table-responsive">
                                 <thead>
                                     <tr>
-                                      <th>Id</th>
+                                      <th>Order Id</th>
                                       <th>Customer Name</th>
+                                      <th>Employee ID</th>
                                       <th>Status</th>
                                     </tr>
                                 </thead>
@@ -112,6 +96,7 @@ const OrderDisplay = () => {
                                           <tr key={index}>
                                               <td>{item.id}</td>
                                               <td>{item.customerName}</td>
+                                              <td>{item.employeeId}</td>
                                               <td>{item.status}</td>
                                           </tr>
                                         )
@@ -142,7 +127,7 @@ const OrderDisplay = () => {
                     :
                         <>
                             <div className="text-light text-center">
-                              <h1>There are currently no orders at the moment.</h1>
+                              <h1>Loading Orders...</h1>
                             </div>
                         </>
                     }
