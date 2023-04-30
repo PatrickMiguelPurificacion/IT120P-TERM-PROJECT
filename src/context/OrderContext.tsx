@@ -192,8 +192,7 @@ export const OrderContext = createContext<{
     ) => Promise<void>;
     getOrder:(
       id: string,
-      customerName: string,
-      employeeID: string|null,
+      type: string
     ) => Promise<void>;
     getOrders:() => Promise<void>;
   }>({
@@ -377,41 +376,8 @@ export const OrderContextProvider = ({children}: {children: ReactNode}) =>{
             const ordersCollection = collection(db, 'Orders');
             const orderDocRef= doc(ordersCollection,id);
             await updateDoc(orderDocRef, order);
-            await getOrder(id,customerName,employeeID);
-            setUpdateOrder({
-              id: id,
-              customerName: customerName,
-              customerNumber: customerNumber,
-              customerAddress: customerAddress,
-              dateCreated: dateCreated,
-              dateCompleted: dateCompleted,
-              employeeID: employeeID,
-              instructions: {
-                bleaching: instructions.bleaching,
-                dryCleaning: instructions.dryCleaning,
-                drying: instructions.drying,
-                ironing: instructions.ironing,
-                specialCare: instructions.specialCare,
-                stainRemoval: instructions.stainRemoval,
-                storage: instructions.storage,
-                washing: instructions.washing,
-                notes: instructions.notes,
-              },
-              laundryInfo: {
-               accesories: laundryInfo.accesories,
-               activeWear: laundryInfo.activeWear,
-               tops: laundryInfo.tops,
-               bottoms: laundryInfo.bottoms,
-               dresses: laundryInfo.dresses,
-               formalWear: laundryInfo.formalWear,
-               sleepWear: laundryInfo.sleepWear,
-               swimWear: laundryInfo.swimWear,
-               undergarments: laundryInfo.undergarments,
-               Notes: laundryInfo.Notes,
-           },
-           status: ''
-
-            })
+            await getOrder(id,'update');
+            
 
 
         } catch (error) {
@@ -433,6 +399,7 @@ export const OrderContextProvider = ({children}: {children: ReactNode}) =>{
           const orderDocRef= doc(ordersCollection,id);
           await deleteDoc(orderDocRef);
           console.log(`Document with ID ${id} successfully deleted`);
+          setDeleteOrder(null);
   
         } catch (error) {
 
@@ -443,67 +410,108 @@ export const OrderContextProvider = ({children}: {children: ReactNode}) =>{
     }
 
     const getOrder = async (
-        id?: string,
-        customerName?: string | null,
-        employeeID?: string | null ,
+        id: string,
+        type: string
     ) => {
 
         try {
-          let order: Order | null = null;
-          let ordersDocRef: Query<DocumentData> | null = null;
+          const ordersDocRef = query(collection(db,'Orders'), where(documentId(), "==", id));
+          const orderQuery = await getDocs(ordersDocRef);
 
-          if (id) {
-            ordersDocRef = query(collection(db, 'Orders'), where(documentId(), "==", id));
-          } 
-          else if (customerName) {
-            ordersDocRef = query(collection(db, 'Orders'), where('Customer_Name', '==', customerName));
-          }
-
-          if (ordersDocRef) {
-            const orderQuery = await getDocs(ordersDocRef);
           if (!orderQuery.empty) {
             orderQuery.forEach((orderData) => {
-              order = {
-                id: orderData.id,
-                customerName: orderData.data().Customer_Name,
-                customerNumber: orderData.data().Contact_Number,
-                customerAddress: orderData.data().Address,
-                dateCreated: orderData.data().Date_Created,
-                dateCompleted: orderData.data().DateCompleted,
-                employeeID: orderData.data().Employee_ID,
-                instructions: {
-                     bleaching: orderData.data().Instructions.Bleaching,
-                     dryCleaning: orderData.data().Instructions.Dry_Cleaning,
-                     drying: orderData.data().Instructions.Drying,
-                     ironing: orderData.data().Instructions.Ironing,
-                     specialCare: orderData.data().Instructions.Special_Care,
-                     stainRemoval: orderData.data().Instructions.Stain_Removal,
-                     storage: orderData.data().Instructions.Storage,
-                     washing: orderData.data().Instructions.Washing,
-                     notes: orderData.data().Instructions.Notes,
-                 },
-                laundryInfo: {
-                     accesories: orderData.data().LaundryInfo.Accessories,
-                     activeWear: orderData.data().LaundryInfo.Activewear,
-                     tops: orderData.data().LaundryInfo.Tops,
-                     bottoms: orderData.data().LaundryInfo.Bottoms,
-                     dresses: orderData.data().LaundryInfo.Dresses,
-                     formalWear: orderData.data().LaundryInfo.Formalwear,
-                     sleepWear: orderData.data().LaundryInfo.Sleepwear,
-                     swimWear: orderData.data().LaundryInfo.Swimwear,
-                     undergarments: orderData.data().LaundryInfo.Undergarments,
-                     Notes: orderData.data().LaundryInfo._Notes,
-                },
-                status: orderData.data().Status,
-            };
-          });
-          if (order) {
-            return setOrder(order);
-          }
-        }
-      }
-        }catch (error) {
+              if (orderData.id === id){
+                if(type === 'update'){
+                    if(orderData.data().dateCompleted){
+                      return setUpdateOrder({
+                        id: orderData.id,
+                        customerName: orderData.data().Customer_Name,
+                        customerNumber: orderData.data().Contact_Number,
+                        customerAddress: orderData.data().Address,
+                        dateCreated: orderData.data().Date_Created.toDate(),
+                        dateCompleted: orderData.data().DateCompleted.toDate(),
+                        employeeID: orderData.data().Employee_ID,
+                        instructions: {
+                             bleaching: orderData.data().Instructions.Bleaching,
+                             dryCleaning: orderData.data().Instructions.Dry_Cleaning,
+                             drying: orderData.data().Instructions.Drying,
+                             ironing: orderData.data().Instructions.Ironing,
+                             specialCare: orderData.data().Instructions.Special_Care,
+                             stainRemoval: orderData.data().Instructions.Stain_Removal,
+                             storage: orderData.data().Instructions.Storage,
+                             washing: orderData.data().Instructions.Washing,
+                             notes: orderData.data().Instructions._Notes,
+                         },
+                        laundryInfo: {
+                             accesories: orderData.data().LaundryInfo.Accessories,
+                             activeWear: orderData.data().LaundryInfo.Activewear,
+                             tops: orderData.data().LaundryInfo.Tops,
+                             bottoms: orderData.data().LaundryInfo.Bottoms,
+                             dresses: orderData.data().LaundryInfo.Dresses,
+                             formalWear: orderData.data().LaundryInfo.Formalwear,
+                             sleepWear: orderData.data().LaundryInfo.Sleepwear,
+                             swimWear: orderData.data().LaundryInfo.Swimwear,
+                             undergarments: orderData.data().LaundryInfo.Undergarments,
+                             Notes: orderData.data().LaundryInfo._Notes,
+                        },
+                        status: orderData.data().Status,
+    
+                        });
 
+                    }
+                    else{
+                      return setUpdateOrder({
+                        id: orderData.id,
+                        customerName: orderData.data().Customer_Name,
+                        customerNumber: orderData.data().Contact_Number,
+                        customerAddress: orderData.data().Address,
+                        dateCreated: orderData.data().Date_Created.toDate(),
+                        dateCompleted: new Date(0),
+                        employeeID: orderData.data().Employee_ID,
+                        instructions: {
+                             bleaching: orderData.data().Instructions.Bleaching,
+                             dryCleaning: orderData.data().Instructions.Dry_Cleaning,
+                             drying: orderData.data().Instructions.Drying,
+                             ironing: orderData.data().Instructions.Ironing,
+                             specialCare: orderData.data().Instructions.Special_Care,
+                             stainRemoval: orderData.data().Instructions.Stain_Removal,
+                             storage: orderData.data().Instructions.Storage,
+                             washing: orderData.data().Instructions.Washing,
+                             notes: orderData.data().Instructions._Notes,
+                         },
+                        laundryInfo: {
+                             accesories: orderData.data().LaundryInfo.Accessories,
+                             activeWear: orderData.data().LaundryInfo.Activewear,
+                             tops: orderData.data().LaundryInfo.Tops,
+                             bottoms: orderData.data().LaundryInfo.Bottoms,
+                             dresses: orderData.data().LaundryInfo.Dresses,
+                             formalWear: orderData.data().LaundryInfo.Formalwear,
+                             sleepWear: orderData.data().LaundryInfo.Sleepwear,
+                             swimWear: orderData.data().LaundryInfo.Swimwear,
+                             undergarments: orderData.data().LaundryInfo.Undergarments,
+                             Notes: orderData.data().LaundryInfo._Notes,
+                        },
+                        status: orderData.data().Status,
+    
+                        });
+                    }
+                      
+                    
+                }else{
+
+                  return setDeleteOrder({
+                    id: orderData.data().Order_ID,
+                    customerName: orderData.data().Customer_Name,
+                    employeeID: orderData.data().Employee_ID
+                  });
+                }
+              }
+          });
+        }
+        else{
+          throw new Error ('Order not Found. ')
+        }
+      }catch (error) {
             console.error(error);
             throw error;
         }
