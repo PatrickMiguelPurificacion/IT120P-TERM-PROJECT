@@ -1,13 +1,10 @@
-import React, { FormEventHandler, useEffect, useState } from 'react'
-import StockPageCSS from './StockPage.module.css'
-import Employee from '../employee/Employee'
+import { FormEventHandler, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/stock-page/FabricFinesse.png';
-import { Link, useNavigate } from 'react-router-dom';
-import Alert from '../alerts/Alerts';
 import { InventoryAuth } from '../../context/InventoryContext';
-import { string } from 'prop-types';
-import { collection, documentId } from '@firebase/firestore';
-import { Item } from '@firebase/analytics';
+import Alert from '../alerts/Alerts';
+import Employee from '../employee/Employee';
+import StockPageCSS from './StockPage.module.css';
 
 const StockPage = () => {
 
@@ -15,8 +12,11 @@ const StockPage = () => {
     const [refreshCounter, setRefreshCounter] = useState(0);
     const [formState, setFormState] = useState('None');
     const [isItemValid, setIsItemValid] = useState(false);
+    const [isEditable, setIsEditable] = useState(false);
+    const [itemId, setItemId] = useState('');
+
     const navigate = useNavigate();
-    const {item, allItems, addItems, updateItems, deleteItems, getItem,getItems}= InventoryAuth ();
+    const {updateItem, deleteItem, addItems, updateItems, deleteItems, getItem}= InventoryAuth ();
     const [ItemsAdd, setaddItem] = useState<{
         name: string;
         brand: string[];
@@ -36,7 +36,7 @@ const StockPage = () => {
       });
       
       //declaring for items update
-      const [ItemsUpdate, setUpdateItem] = useState<{
+      const [ItemsUpdate, setItemsUpdate] = useState<{
         id: string;
         name: string;
         brand: string[];
@@ -57,8 +57,7 @@ const StockPage = () => {
       });
 
       // delete items
-
-      const [deleteItem, setdeleteItem] = useState<{
+      const [itemsDelete, setItemsDelete] = useState<{
         id: string;
         name: string;
         brand: string[];
@@ -95,6 +94,9 @@ const StockPage = () => {
               await addItems( name, brand,code, quantity,unitPrice,purpose ).then(()=>{
       
                 setRefreshCounter(prevCounter => prevCounter + 1);
+                setaddItem({name:'', brand:[], code:[], quantity:0, unitPrice:0, totalPrice:0,purpose:[]});
+                setIsEditable(false);
+                setIsItemValid(false);
                 return setAlertMessage({type: 'success', message: 'Item Added Successfully.', show: true});
       
             }).catch((error)=>{
@@ -111,6 +113,30 @@ const StockPage = () => {
         }
     }
     
+    const searchItem = async (type: string) =>{
+
+        try{
+
+            setAlertMessage({type: '', message: '', show: false});
+
+            await getItem(itemId, type).then(()=>{
+
+                setIsEditable(true);
+                setRefreshCounter(prevCounter => prevCounter + 1);
+                return setAlertMessage({type: 'success', message: 'Item Found.', show: true});
+
+            });
+            
+        }catch(e: unknown){
+            
+            if(e instanceof Error){
+                return setAlertMessage({type: 'error', message: e.message, show: true});
+            }
+
+        }
+
+    }
+
 
     const itemUpdate: FormEventHandler<HTMLFormElement> = async (e) => {
 
@@ -130,9 +156,11 @@ const StockPage = () => {
               } = ItemsUpdate;
               await updateItems(id,name,brand,code,quantity,unitPrice,totalPrice,purpose)
               .then(()=>{
+                  if(updateItem){
+                    setItemsUpdate(updateItem);
+                  }
                   setRefreshCounter(prevCounter => prevCounter + 1);
-                  getItem(id,name,brand,code);
-                  return setAlertMessage({type: 'success', message: 'Order Updated Successfully.', show: true});
+                  return setAlertMessage({type: 'success', message: 'Item Updated Successfully.', show: true});
               })
         }catch(e: unknown){
             
@@ -143,7 +171,6 @@ const StockPage = () => {
         }
 
     }
-      //end of stocks update
 
     const itemDelete: FormEventHandler<HTMLFormElement> = async (e) => {
 
@@ -156,13 +183,15 @@ const StockPage = () => {
                 name,
                 brand,
                 code,
-              } = deleteItem;
-              await deleteItems(id,name,brand,code)
-              
-              .then(()=>{
+              } = itemsDelete;
+              await deleteItems(id,name,brand,code).then(()=>{
+
                 setRefreshCounter(prevCounter => prevCounter + 1);
-                getItem(id,name,brand,code);
-                return setAlertMessage({type: 'success', message: 'Order Deleted Successfully.', show: true});
+                setItemsDelete({id:'',name:'',code:[],brand:[]});
+                setIsEditable(false);
+                setIsItemValid(false);
+                return setAlertMessage({type: 'success', message: 'Item Deleted Successfully.', show: true});
+
             })
       }catch(e: unknown){
           
@@ -172,16 +201,16 @@ const StockPage = () => {
 
       }
 
-  }
+    }
+
     useEffect(() =>{
 
-        if (ItemsAdd.name && ItemsAdd.brand && ItemsAdd.code)
+        if (ItemsAdd.name && ItemsAdd.brand && ItemsAdd.code && ItemsAdd.quantity && ItemsAdd.unitPrice && ItemsAdd.purpose)
         {
             setIsItemValid(true);
         }
-        
-        
-      },[ItemsAdd])
+
+    },[ItemsAdd])
 
     useEffect(()=>{
 
@@ -193,31 +222,60 @@ const StockPage = () => {
     
     useEffect(() =>{
 
-        if (ItemsUpdate.name && ItemsUpdate.brand && ItemsUpdate.code)
+    if (ItemsUpdate.name && ItemsUpdate.brand && ItemsUpdate.code && ItemsUpdate.id && ItemsUpdate.quantity && ItemsUpdate.unitPrice && ItemsUpdate.totalPrice)
+    {
+        setIsItemValid(true);
+    }
+    
+    },[ItemsUpdate])
+
+    useEffect(()=>{
+
+    if(alertMessage.show){
+        setTimeout(()=>{setAlertMessage({type: '', message: '', show: false})}, 5000)
+    }
+
+    },[alertMessage.message]);
+    
+    useEffect(() =>{
+
+        if (itemsDelete.id && itemsDelete.name && itemsDelete.brand && itemsDelete.code)
         {
             setIsItemValid(true);
+
         }
         
+    },[itemsDelete])
+
+    useEffect(() => {
         
-      },[ItemsUpdate])
+        if (updateItem !== null) {
+          
+            setItemsUpdate(updateItem);
 
-      useEffect(()=>{
-
-        if(alertMessage.show){
-            setTimeout(()=>{setAlertMessage({type: '', message: '', show: false})}, 5000)
         }
-  
-      },[alertMessage.message]);
-      
-      useEffect(() =>{
-  
-          if (deleteItem.name && deleteItem.brand && deleteItem.code)
-          {
-              setIsItemValid(true);
-          }
+
+    }, [updateItem]);
+
+    useEffect(() => {
+        
+        if (deleteItem !== null) {
           
-          
-        },[deleteItem])
+            setItemsDelete(deleteItem);
+
+        }
+
+    }, [deleteItem]);
+
+    useEffect(() =>{
+
+        setIsEditable(false);
+        setIsItemValid(false);
+        setaddItem({name:'', brand:[], code:[], quantity:0, unitPrice:0, totalPrice:0,purpose:[]});
+        setItemsUpdate({id:'',name:'',code:[],brand:[],quantity:0,totalPrice:0,unitPrice:0,purpose:[]});
+        setItemsDelete({id:'',name:'',code:[],brand:[]});
+
+    }, [formState])
 
     return (
       <>
@@ -258,7 +316,7 @@ const StockPage = () => {
                                 <h1><strong>ADD AN ITEM</strong></h1>
                             </div>
                             <div className="row text-center">
-                                <div className="col-md-6">
+                                <div className="col-sm-6 col-md-12">
                                     <form className="form" onSubmit={addItem}>
                                         <div className="row">
                                           <div className="col-md-6">
@@ -272,22 +330,22 @@ const StockPage = () => {
                                               </div>
                                               <div className="form-outline">
                                                   <label className="form-label">ITEM CODE</label>
-                                                  <p><input type="text" id="ItemCode" placeholder="Item Code" onChange={(e) => setaddItem({ ...ItemsAdd, code: [e.target.value] })}/> /</p>
+                                                  <p><input type="text" id="ItemCode" placeholder="Item Code" onChange={(e) => setaddItem({ ...ItemsAdd, code: [e.target.value] })}/></p>
                                               </div>
                                           </div>
                                           <div className="col-md-6">
                                               <div className="form-outline">
                                                   <label className="form-label">QUANTITY</label>
-                                                  <p><input type="text" inputMode='numeric' id="Quantity" placeholder="Quantity" onChange={(e) => setaddItem({ ...ItemsAdd, quantity: parseInt(e.target.value) })}/> /</p>
+                                                  <p><input type="text" inputMode='numeric' id="Quantity" placeholder="Quantity" onChange={(e) => setaddItem({ ...ItemsAdd, quantity: parseInt(e.target.value) })}/></p>
 
                                               </div>
                                               <div className="form-outline">
                                                   <label className="form-label">UNIT PRICE</label>
-                                                  <p><input type="text" inputMode='numeric' id="ItemUnitPrice" placeholder="Unit Price" onChange={(e) => setaddItem({ ...ItemsAdd, unitPrice: parseInt(e.target.value) })}/> /</p>
+                                                  <p><input type="text" inputMode='numeric' id="ItemUnitPrice" placeholder="Unit Price" onChange={(e) => setaddItem({ ...ItemsAdd, unitPrice: parseInt(e.target.value) })}/></p>
                                               </div>
                                               <div className="form-outline">
                                                   <label className="form-label">PURPOSE</label>
-                                                  <p><input type="text" id="Purpose" placeholder="Item Purpose" onChange={(e) => setaddItem({ ...ItemsAdd, purpose: [e.target.value] })}/> </p>
+                                                  <p><input type="text" id="Purpose" placeholder="Item Purpose" onChange={(e) => setaddItem({ ...ItemsAdd, purpose: [e.target.value] })}/></p>
                                               </div>
                                           </div>
                                         </div>
@@ -300,9 +358,6 @@ const StockPage = () => {
                                             <button className="btn btn-primary ms-5 ps-5 pe-5 p-3" onClick={()=>{setFormState('None')}}>BACK</button>
                                         </div>
                                     </form>
-                                </div>
-                                <div className="col-md-6">
-                                    Test
                                 </div>
                             </div>
                         </div>
@@ -319,37 +374,37 @@ const StockPage = () => {
                                             <div className="col-md-6">
                                                 <div className="form-outline">
                                                     <label className="form-label">ITEM ID</label>
-                                                    <p><input type="text" id="ItemId" placeholder="Item ID" onChange={(e) => setUpdateItem({ ...ItemsUpdate, id: e.target.value })}/></p>
-                                                    </div>
+                                                    <p><input type="text" id="ItemId" placeholder="Item ID" onChange={(e) => setItemsUpdate({ ...ItemsUpdate, id: e.target.value })} value={ItemsUpdate.id} readOnly /></p>
+                                                </div>
                                                 <div className="form-outline">
                                                     <label className="form-label">ITEM NAME</label>
-                                                    <p><input type="text" id="ItemName" placeholder="Item Name"onChange={(e) => setUpdateItem({ ...ItemsUpdate, name: (e.target.value) })}/></p>
+                                                    <p><input type="text" id="ItemName" placeholder="Item Name" onChange={(e) => setItemsUpdate({ ...ItemsUpdate, name: (e.target.value) })} disabled={!isEditable} value={ItemsUpdate.name}/></p>
                                                 </div>
                                                 <div className="form-outline">
                                                     <label className="form-label">ITEM BRAND</label>
-                                                    <p><input type="text" id="ItemBrand" placeholder="Item Brand" onChange={(e) => setUpdateItem({ ...ItemsUpdate, brand: [e.target.value] })}/> </p>
+                                                    <p><input type="text" id="ItemBrand" placeholder="Item Brand" onChange={(e) => setItemsUpdate({ ...ItemsUpdate, brand: [e.target.value] })} disabled={!isEditable} value={ItemsUpdate.brand}/> </p>
                                                 </div>
                                                 <div className="form-outline">
                                                     <label className="form-label">ITEM CODE</label>
-                                                    <p><input type="text" id="ItemCode" placeholder="Item Code" onChange={(e) => setUpdateItem({ ...ItemsUpdate, code: [e.target.value] })}/> /</p>
+                                                    <p><input type="text" id="ItemCode" placeholder="Item Code" onChange={(e) => setItemsUpdate({ ...ItemsUpdate, code: [e.target.value] })} disabled={!isEditable} value={ItemsUpdate.code}/></p>
                                                 </div>
                                             </div>
                                             <div className="col-md-6">
                                                 <div className="form-outline">
                                                     <label className="form-label">QUANTITY</label>
-                                                    <p><input type="text" inputMode='numeric' id="Quantity" placeholder="Quantity" onChange={(e) => setUpdateItem({ ...ItemsUpdate, quantity: parseInt (e.target.value) })}/></p>
+                                                    <p><input type="text" inputMode='numeric' id="Quantity" placeholder="Quantity" onChange={(e) => setItemsUpdate({ ...ItemsUpdate, quantity: Number(e.target.value) })} disabled={!isEditable} value={ItemsUpdate.quantity}/></p>
                                                 </div>
                                                 <div className="form-outline">
                                                     <label className="form-label">UNIT PRICE</label>
-                                                    <p><input type="text" inputMode='numeric' id="ItemUnitPrice" placeholder="Unit Price"  onChange={(e) => setUpdateItem({ ...ItemsUpdate, unitPrice: parseFloat(e.target.value) })}/></p>
+                                                    <p><input type="text" inputMode='numeric' id="ItemUnitPrice" placeholder="Unit Price"  onChange={(e) => setItemsUpdate({ ...ItemsUpdate, unitPrice: Number(e.target.value) })} disabled={!isEditable} value={ItemsUpdate.unitPrice}/></p>
                                                 </div>
                                                 <div className="form-outline">
                                                     <label className="form-label">TOTAL PRICE</label>
-                                                    <p><input type="text" inputMode='numeric' id="ItemTotalPrice" placeholder="Total Price"  onChange={(e) => setUpdateItem({ ...ItemsUpdate, totalPrice: parseFloat(e.target.value) })}/></p>
+                                                    <p><input type="text" inputMode='numeric' id="ItemTotalPrice" placeholder="Total Price"  onChange={(e) => setItemsUpdate({ ...ItemsUpdate, totalPrice: parseFloat(e.target.value) })} readOnly value={ItemsUpdate.totalPrice}/></p>
                                                 </div>
                                                 <div className="form-outline">
                                                     <label className="form-label">PURPOSE</label>
-                                                    <p><input type="text" id="Purpose" placeholder="Item Purpose" onChange={(e) => setUpdateItem({ ...ItemsUpdate, purpose: [e.target.value] })} /></p>
+                                                    <p><input type="text" id="Purpose" placeholder="Item Purpose" onChange={(e) => setItemsUpdate({ ...ItemsUpdate, purpose: [e.target.value] })} disabled={!isEditable} value={ItemsUpdate.purpose}/></p>
                                                 </div>
                                             </div>
                                           </div>
@@ -364,7 +419,23 @@ const StockPage = () => {
                                       </form>
                                   </div>
                                   <div className="col-md-6">
-                                      Test
+                                    <label>SEARCH ITEM ID</label>
+                                    <p><input type="text" id="ItemId" placeholder="Item ID" onChange={(e) => setItemId(e.target.value)}
+                                        onKeyDown={event => {
+                                            if (event.key === 'Enter') {
+                                              searchItem('update');
+                                            }
+                                          }}
+                                    /></p>
+                                    {updateItem ? 
+                                        <div>
+                                            Item Found.
+                                        </div>
+                                    :
+                                        <div>
+                                            Item Not Found.
+                                        </div>
+                                    }
                                   </div>
                               </div>
                           </div>
@@ -381,21 +452,21 @@ const StockPage = () => {
                                           <div className="col-md-6">
                                               <div className="form-outline">
                                                   <label className="form-label">ITEM ID</label>
-                                                  <p><input type="text" id="ItemId" placeholder="Item ID" onChange={(e) => setdeleteItem({ ...deleteItem, id: e.target.value })}/></p>
+                                                  <p><input type="text" id="ItemId" placeholder="Item ID" onChange={(e) => setItemsDelete({ ...itemsDelete, id: e.target.value })} value={itemsDelete.id} readOnly/></p>
                                               </div>
                                               <div className="form-outline">
                                                   <label className="form-label">ITEM NAME</label>
-                                                  <p><input type="text" id="ItemName" placeholder="Item Name" onChange={(e) => setdeleteItem({ ...deleteItem, name: e.target.value })}/></p>
+                                                  <p><input type="text" id="ItemName" placeholder="Item Name" onChange={(e) => setItemsDelete({ ...itemsDelete, name: e.target.value })} value={itemsDelete.name} readOnly/></p>
                                               </div>
                                           </div>
                                           <div className="col-md-6">
                                               <div className="form-outline">
                                                   <label className="form-label">ITEM BRAND</label>
-                                                  <p><input type="text" id="ItemBrand" placeholder="Item Brand"onChange={(e) => setdeleteItem({ ...deleteItem, brand: [e.target.value] })}/></p>
+                                                  <p><input type="text" id="ItemBrand" placeholder="Item Brand"onChange={(e) => setItemsDelete({ ...itemsDelete, brand: [e.target.value] })} value={itemsDelete.brand} readOnly/></p>
                                               </div>
                                               <div className="form-outline">
                                                   <label className="form-label">ITEM CODE</label>
-                                                  <p><input type="text" id="ItemCode" placeholder="Item Code"onChange={(e) => setdeleteItem({ ...deleteItem,code: [e.target.value] })}/></p>
+                                                  <p><input type="text" id="ItemCode" placeholder="Item Code"onChange={(e) => setItemsDelete({ ...itemsDelete,code: [e.target.value] })} value={itemsDelete.code} readOnly/></p>
                                               </div>
                                           </div>
                                         </div>
@@ -410,8 +481,24 @@ const StockPage = () => {
                                     </form>
                                 </div>
                                 <div className="col-md-6">
-                                    Test
-                                </div>
+                                    <label>SEARCH ITEM ID</label>
+                                    <p><input type="text" id="ItemId" placeholder="Item ID" onChange={(e) => setItemId(e.target.value)}
+                                        onKeyDown={event => {
+                                            if (event.key === 'Enter') {
+                                              searchItem('delete');
+                                            }
+                                          }}
+                                    /></p>
+                                    {deleteItem ? 
+                                        <div>
+                                            Item Found.
+                                        </div>
+                                    :
+                                        <div>
+                                            Item Not Found.
+                                        </div>
+                                    }
+                                  </div>
                             </div>
                         </div>
                     }
