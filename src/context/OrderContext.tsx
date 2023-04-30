@@ -1,5 +1,5 @@
 import { EmailAuthProvider, User as FirebaseUser, createUserWithEmailAndPassword, getAuth, onAuthStateChanged, reauthenticateWithCredential, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { DocumentData, FieldValue, Query, arrayUnion, collection, deleteDoc, doc, documentId, getDoc, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore';
+import { DocumentData, FieldValue, Query, arrayUnion, collection, deleteDoc, doc, documentId, getDoc, getDocs, limit, query, setDoc, updateDoc, where } from 'firebase/firestore';
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from '../scripts/firebase-init';
 import { StorageAuth } from './StorageContext';
