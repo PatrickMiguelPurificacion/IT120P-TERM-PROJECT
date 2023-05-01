@@ -1,6 +1,22 @@
+import { useEffect, useState } from 'react';
+import { UserAuth } from '../../context/UserContext'
 import ServicesCSS from './Services.module.css'
+import { Link } from 'react-router-dom';
 
 function Services(){
+
+    const {currentEmployee} = UserAuth();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() =>{
+
+        if(currentEmployee){
+
+            setIsLoggedIn(true);
+
+        }
+
+    }, [currentEmployee])
 
     const services = [
         {
@@ -46,9 +62,7 @@ function Services(){
                             </ul>
                             <h1 className="text-center pt-5 mt-5">AVAILABLE ORDERS</h1>
                             <div className="text-center p-5">
-                                <button className="btn btn-primary ms-0 p-3">EMAIL</button>
-                                <button className="btn btn-primary ms-5 p-3">PHONE</button>
-                                <button className="btn btn-primary ms-5 p-3">WALK-IN</button>
+                                <div className="bg-primary ms-0 p-3">EMAIL, PHONE, AND WALK-IN</div>
                             </div>
                         </div>
                         <div className="col-md-6 text-center">
@@ -69,7 +83,11 @@ function Services(){
                                     <div className="col-md-4 text-center">
                                         <p className="display-5 mt-5">PHP{item.Price}</p>
                                         <img src={item.ImageUrl} width="80%" />
-                                        <button className="btn btn-primary mt-5 p-3">Create Order</button>
+                                        {isLoggedIn ?
+                                            <Link to="/dashboard/order" onClick={window.location.reload}><button type="button" className="btn btn-primary mt-5 p-3">Create Order</button></Link>
+                                        :
+                                            <button type="button" className="btn btn-danger mt-5 p-3" disabled>Create Order</button>
+                                        }
                                     </div>
                                     <div className="col-md-8">
                                         <div className="row mt-5 p-5">
@@ -118,7 +136,11 @@ function Services(){
                                     <div className="col-md-4 text-center">
                                         <p className="display-5 mt-5">PHP{item.Price}</p>
                                         <img src={item.ImageUrl} width="80%" />
-                                        <button className="btn btn-primary mt-5 p-3">Create Order</button>
+                                        {isLoggedIn ?
+                                            <Link to="/dashboard/order" onClick={window.location.reload}><button type="button" className="btn btn-primary mt-5 p-3">Create Order</button></Link>
+                                        :
+                                            <button type="button" className="btn btn-danger mt-5 p-3" disabled>Create Order</button>
+                                        }
                                     </div>
                                 </div>
                             </div>
