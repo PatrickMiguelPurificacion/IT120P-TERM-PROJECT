@@ -1,4 +1,4 @@
-import { EmailAuthProvider, User as FirebaseUser, createUserWithEmailAndPassword, getAuth, onAuthStateChanged, reauthenticateWithCredential, signInWithEmailAndPassword, signOut, updatePassword } from 'firebase/auth';
+import { EmailAuthProvider, User as FirebaseUser, createUserWithEmailAndPassword, getAuth, onAuthStateChanged, reauthenticateWithCredential, signInWithEmailAndPassword, signOut, updateEmail, updatePassword } from 'firebase/auth';
 import { FieldPath, Timestamp, arrayUnion, collection, doc, documentId, getDocs, limit, query, setDoc, updateDoc, where } from 'firebase/firestore';
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from '../scripts/firebase-init';
@@ -216,6 +216,13 @@ export const AuthContextProvider = ({children}: {children: ReactNode}) =>{
             const credential = EmailAuthProvider.credential(email, password);
     
             await reauthenticateWithCredential(auth.currentUser!, credential);
+
+            if(email !== auth.currentUser!.email){
+
+                await updateEmail(auth.currentUser!, email);
+
+            }
+
             const employeesCollection = collection(db, 'Employees');
             const employeeDocRef = doc(employeesCollection, uuid);
     
